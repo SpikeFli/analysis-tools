@@ -1,0 +1,15 @@
+# Core data analysis dependencies
+pandas>=2.0.0
+numpy>=1.24.0
+
+# Date/time handling
+python-dateutil>=2.8.2
+
+# Report generation (optional)
+markdown>=3.5
+pdfkit>=1.0.0
+
+# Development dependencies (optional)
+# black>=23.0.0
+# flake8>=6.0.0
+# pytest>=7.0.0

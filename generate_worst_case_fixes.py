@@ -1,0 +1,184 @@
+#!/usr/bin/env python3
+"""
+SpikeFli Worst Case Mismatch SQL Generator
+
+Generates SQL to fix the worst case mismatches - where both user and status are wrong.
+These are the most critical phone reassignments that need immediate attention.
+"""
+
+import os
+import pandas as pd
+from datetime import datetime
+
+def escape_sql_string(value):
+    """Escape single quotes in SQL strings"""
+    if pd.isna(value) or value == '':
+        return ''
+    return str(value).replace("'", "''")
+
+def get_customer_id():
+    """Prompt user for the customer ID digits"""
+    while True:
+        customer_digits = input("🔢 Enter the last 3 digits of the customer ID (e.g., 096): ").strip()
+
+        if len(customer_digits) == 3 and customer_digits.isdigit():
+            customer_id = f"0000000{customer_digits}"
+            print(f"  ✅ Using customer ID: {customer_id}")
+            return customer_id
+        else:
+            print("❌ Please enter exactly 3 digits (e.g., 096, 057, 123)")
+
+def find_latest_worst_case_file():
+    """Find the most recent worst case mismatches CSV file"""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_dir = os.path.join(script_dir, "output")
+
+    if not os.path.exists(output_dir):
+        return None
+
+    # Find latest worst case file
+    worst_case_files = [f for f in os.listdir(output_dir) if f.startswith('worst_case_mismatches_') and f.endswith('.csv')]
+
+    if not worst_case_files:
+        return None
+
+    latest_file = max(worst_case_files, key=lambda x: os.path.getmtime(os.path.join(output_dir, x)))
+    return os.path.join(output_dir, latest_file)
+
+def generate_worst_case_fix_sql(customer_id=None):
+    """Generate SQL to fix worst case mismatches"""
+
+    print("🔧 GENERATING WORST CASE MISMATCH FIX SQL...")
+
+    # Get customer ID if not provided
+    if customer_id is None:
+        customer_id = get_customer_id()
+
+    # Find latest worst case file
+    worst_case_file = find_latest_worst_case_file()
+
+    if not worst_case_file:
+        print("❌ No worst case mismatches file found!")
+        print("   Please run the comprehensive analysis first to generate worst case data.")
+        return False
+
+    print(f"  📂 Using worst case file: {os.path.basename(worst_case_file)}")
+
+    # Load data
+    try:
+        worst_cases_df = pd.read_csv(worst_case_file)
+        print(f"  📊 Worst case mismatches to fix: {len(worst_cases_df)}")
+    except Exception as e:
+        print(f"❌ Error loading worst case file: {e}")
+        return False
+
+    if len(worst_cases_df) == 0:
+        print("✅ No worst case mismatches found - everything is working well!")
+        return True
+
+    # Generate output filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    output_path = os.path.join("output", f"Worst_Case_Fixes_{timestamp}.sql")
+
+    sql_statements = []
+
+    # Header
+    sql_statements.append("-- SpikeFli Worst Case Mismatch Fixes")
+    sql_statements.append(f"-- Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    sql_statements.append(f"-- Customer ID: {customer_id}")
+    sql_statements.append(f"-- Worst case mismatches to fix: {len(worst_cases_df)}")
+    sql_statements.append("-- These are cases where BOTH user and status are incorrect")
+    sql_statements.append("")
+    sql_statements.append("BEGIN TRANSACTION;")
+    sql_statements.append("")
+
+    # Fix each worst case mismatch
+    sql_statements.append("-- ================================================================================")
+    sql_statements.append(f"-- FIX {len(worst_cases_df)} WORST CASE MISMATCHES")
+    sql_statements.append("-- Update ServiceDetails to show correct current AD user")
+    sql_statements.append("-- ================================================================================")
+    sql_statements.append("")
+
+    fix_count = 0
+    for _, row in worst_cases_df.iterrows():
+        phone = str(row['phone_number'])
+        service_user = escape_sql_string(row['service_clean_name'])
+        ad_user = escape_sql_string(row['ad_user'])
+
+        # Format phone number with dashes (XXX-XXX-XXXX format for database)
+        if len(phone) == 10 and phone.isdigit():
+            formatted_phone = f"{phone[:3]}-{phone[3:6]}-{phone[6:]}"
+        else:
+            formatted_phone = phone  # Use as-is if not standard 10-digit format
+
+        sql_statements.append(f"-- Fix phone reassignment: {phone}")
+        sql_statements.append(f"-- Old user: {service_user} → Current AD user: {ad_user}")
+        sql_statements.append(f"UPDATE sd")
+        sql_statements.append(f"SET sd.UserRef = p.id,")
+        sql_statements.append(f"    sd.UserRef_Type = 'AD Fix',")
+        sql_statements.append(f"    sd.Username = LEFT(p.username, 20)")
+        sql_statements.append(f"FROM C_{customer_id}_ServiceDetails sd")
+        sql_statements.append(f"INNER JOIN C_{customer_id}_People p ON p.username = '{ad_user}'")
+        sql_statements.append(f"WHERE sd.AssetID = '{formatted_phone}';")
+        sql_statements.append("")
+        fix_count += 1    # Verification queries
+    sql_statements.append("-- ================================================================================")
+    sql_statements.append("-- VERIFICATION QUERIES")
+    sql_statements.append("-- ================================================================================")
+    sql_statements.append("")
+    sql_statements.append("-- Check how many worst case fixes were applied")
+    sql_statements.append(f"SELECT COUNT(*) as worst_case_fixes_applied")
+    sql_statements.append(f"FROM C_{customer_id}_ServiceDetails")
+    sql_statements.append("WHERE UserRef_Type = 'AD Fix';")
+    sql_statements.append("")
+    sql_statements.append("-- Show the fixed services")
+    sql_statements.append(f"SELECT sd.AssetID, sd.Username, p.username as AD_Username")
+    sql_statements.append(f"FROM C_{customer_id}_ServiceDetails sd")
+    sql_statements.append(f"LEFT JOIN C_{customer_id}_People p ON sd.UserRef = p.id")
+    sql_statements.append("WHERE sd.UserRef_Type = 'AD Fix'")
+    sql_statements.append("ORDER BY sd.AssetID;")
+    sql_statements.append("")
+
+    sql_statements.append("COMMIT;")
+    sql_statements.append("")
+    sql_statements.append(f"-- Summary: Fixed {fix_count} worst case mismatches")
+    sql_statements.append("-- These were the most critical phone reassignment issues!")
+
+    # Write SQL file
+    try:
+        os.makedirs("output", exist_ok=True)
+        with open(output_path, 'w', encoding='utf-8') as f:
+            f.write('\n'.join(sql_statements))
+
+        print(f"  💾 Generated SQL file: {os.path.basename(output_path)}")
+        print(f"  📊 Total fixes: {fix_count}")
+
+        return output_path
+    except Exception as e:
+        print(f"❌ Error saving SQL file: {e}")
+        return False
+
+def main():
+    """Main execution function"""
+
+    print("=" * 60)
+    print("🔧 SPIKEFLI WORST CASE MISMATCH FIX GENERATOR")
+    print("=" * 60)
+
+    result = generate_worst_case_fix_sql()
+
+    if result:
+        print("\n✅ WORST CASE FIX SQL GENERATED!")
+        print("\n📋 EXECUTION ORDER:")
+        print("1. Execute this SQL in SSMS")
+        print("2. Run analysis again to verify fixes")
+        print("3. Check that worst case mismatches are reduced to zero")
+
+        print(f"\n💡 TIP: This SQL fixes the most critical phone reassignment issues")
+        print("     These are cases where both user and status were incorrect!")
+
+    else:
+        print("\n❌ WORST CASE FIX GENERATION FAILED!")
+
+if __name__ == "__main__":
+    main()
