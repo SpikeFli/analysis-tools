@@ -223,7 +223,8 @@ class SpikeFliDataAnalyzer:
         print("\n🗃️  ANALYZING PEOPLE DATABASE...")
 
         if self.people_data is None:
-            print("❌ No People data loaded")
+            print("ℹ️  No People data available - skipping People database analysis")
+            print("   (People database is only available for Northview client)")
             return
 
         # Filter AD-linked records
@@ -440,15 +441,20 @@ class SpikeFliDataAnalyzer:
 
         return phone_cross_reference, phone_reassignments, status_mismatches
 
-    def generate_report(self, output_dir="output"):
+    def generate_report(self, output_dir="output", client_name=None):
         """Generate detailed report files including comprehensive Markdown report"""
         print(f"\n📝 GENERATING REPORTS...")
 
-        os.makedirs(output_dir, exist_ok=True)
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        # Use client-organized output structure
+        client_name = client_name or getattr(self, 'client_name', 'Unknown')
 
-        # Generate comprehensive Markdown report
-        md_file = os.path.join(output_dir, f"SpikeFli_Analysis_Report_{timestamp}.md")
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        base_output_dir = os.path.join(script_dir, "output")
+        client_output_dir = os.path.join(base_output_dir, client_name)
+        os.makedirs(client_output_dir, exist_ok=True)
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        md_file = os.path.join(client_output_dir, f"SpikeFli_Analysis_Report_{timestamp}.md")
         with open(md_file, 'w') as f:
             f.write(f"# SpikeFli Data Analysis Report\n\n")
             f.write(f"**Generated:** {datetime.now().strftime('%B %d, %Y at %I:%M %p')}\n\n")
@@ -489,13 +495,13 @@ class SpikeFliDataAnalyzer:
                 f.write(f"### 🚨 Critical Status Issues ({total_issues} total)\n\n")
                 f.write(f"| Issue Type | Count | Impact | Priority |\n")
                 f.write(f"|------------|-------|--------|----------|\n")
-                f.write(f"| Should be ACTIVE | {len(self.results['cross_reference']['should_be_active'])} | Users can't access services | 🔴 High |\n")
+                f.write(f"| Phone Assignment Issues | {len(self.results['cross_reference']['should_be_active'])} | Active employees can't access their phones | 🔴 High |\n")
                 f.write(f"| **Should be EXPIRED** | **{len(self.results['cross_reference']['should_be_expired'])}** | **Paying for unused services** | **🔴 Critical** |\n")
                 f.write(f"| Correctly EXPIRED | {len(self.results['cross_reference']['correctly_expired'])} | No action needed | ✅ Good |\n\n")
 
                 f.write(f"**🔍 What These Issues Mean:**\n")
                 f.write(f"- **Should be EXPIRED:** Users left company but we're still paying for their phone service\n")
-                f.write(f"- **Should be ACTIVE:** Current employees can't access phone services they need\n\n")
+                f.write(f"- **Phone Assignment Issues:** Phone numbers assigned to wrong users (active employees can't access their phones)\n\n")
 
             # Active Directory Analysis
             f.write(f"## 🗂️ Active Directory Analysis\n\n")
@@ -600,8 +606,8 @@ class SpikeFliDataAnalyzer:
 
                 should_be_active = self.results['cross_reference']['should_be_active']
                 if should_be_active:
-                    f.write(f"### 🟡 Users Who Should Be ACTIVE ({len(should_be_active)} found)\n\n")
-                    f.write(f"These users are **ENABLED in Active Directory** but marked as **EXPIRED in Service Overview**:\n\n")
+                    f.write(f"### 🟡 Phone Assignment Issues ({len(should_be_active)} found)\n\n")
+                    f.write(f"These phone numbers are assigned to **EXPIRED users** in Service Overview, but the phones actually belong to **ACTIVE employees** in Active Directory:\n\n")
                     f.write(f"| Phone Number | Service Overview User | Active Directory User | Problem |\n")
                     f.write(f"|--------------|----------------------|----------------------|---------|\n")
 
@@ -772,32 +778,35 @@ class SpikeFliDataAnalyzer:
         else:
             print(f"  ℹ️  PDF generation not available (install: pip install markdown pdfkit)")
 
-        # Generate detailed CSV files
+        # Generate detailed CSV files using client-organized structure
+        def get_output_file(filename):
+            return os.path.join(client_output_dir, filename)
+
         if 'cross_reference' in self.results:
             # Should be Active report
             if self.results['cross_reference']['should_be_active']:
-                active_file = os.path.join(output_dir, f"should_be_active_{timestamp}.csv")
+                active_file = get_output_file(f"should_be_active_{timestamp}.csv")
                 df = pd.DataFrame(self.results['cross_reference']['should_be_active'])
                 df.to_csv(active_file, index=False)
                 print(f"  ✅ Should be Active CSV: {active_file}")
 
             # Should be Expired report
             if self.results['cross_reference']['should_be_expired']:
-                expired_file = os.path.join(output_dir, f"should_be_expired_{timestamp}.csv")
+                expired_file = get_output_file(f"should_be_expired_{timestamp}.csv")
                 df = pd.DataFrame(self.results['cross_reference']['should_be_expired'])
                 df.to_csv(expired_file, index=False)
                 print(f"  ✅ Should be Expired CSV: {expired_file}")
 
             # Phone Reassignments report (CRITICAL)
             if self.results['cross_reference']['phone_reassignments']:
-                reassign_file = os.path.join(output_dir, f"phone_reassignments_{timestamp}.csv")
+                reassign_file = get_output_file(f"phone_reassignments_{timestamp}.csv")
                 df = pd.DataFrame(self.results['cross_reference']['phone_reassignments'])
                 df.to_csv(reassign_file, index=False)
                 print(f"  ✅ Phone Reassignments CSV: {reassign_file}")
 
             # Phone Cross-Reference report (CORE DATA)
             if self.results['cross_reference']['phone_cross_reference']:
-                cross_ref_file = os.path.join(output_dir, f"phone_cross_reference_{timestamp}.csv")
+                cross_ref_file = get_output_file(f"phone_cross_reference_{timestamp}.csv")
                 df = pd.DataFrame(self.results['cross_reference']['phone_cross_reference'])
                 df.to_csv(cross_ref_file, index=False)
                 print(f"  ✅ Phone Cross-Reference CSV: {cross_ref_file}")
@@ -807,7 +816,7 @@ class SpikeFliDataAnalyzer:
                              if not ref['users_match'] and not ref['status_consistent']]
 
                 if worst_cases:
-                    worst_case_file = os.path.join(output_dir, f"worst_case_mismatches_{timestamp}.csv")
+                    worst_case_file = get_output_file(f"worst_case_mismatches_{timestamp}.csv")
                     df = pd.DataFrame(worst_cases)
                     df.to_csv(worst_case_file, index=False)
                     print(f"  ✅ Worst Case Mismatches CSV: {worst_case_file} ({len(worst_cases)} cases)")
@@ -819,7 +828,7 @@ class SpikeFliDataAnalyzer:
                 df.to_csv(reassign_file, index=False)
                 print(f"  ✅ Phone Reassignments CSV: {reassign_file}")
 
-    def run_full_analysis(self, ad_path, service_path, people_path, user_mgmt_path):
+    def run_full_analysis(self, ad_path, service_path, people_path, user_mgmt_path, client_name=None):
         """Run complete analysis"""
         print("🚀 STARTING COMPREHENSIVE DATA ANALYSIS")
         print("=" * 50)
@@ -835,7 +844,10 @@ class SpikeFliDataAnalyzer:
         self.analyze_people_database()
         self.analyze_service_overview()
         self.cross_reference_analysis()
-        self.generate_report()
+
+        # Store client name for organized output
+        self.client_name = client_name or 'Unknown'
+        self.generate_report(client_name=client_name)
 
         print("\n" + "=" * 50)
         print("✅ ANALYSIS COMPLETE")
@@ -850,57 +862,138 @@ def find_latest_file(directory, pattern):
         return None
     return max(files, key=os.path.getmtime)
 
+def scan_available_clients():
+    """Scan for available clients and their data status"""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    inputs_dir = os.path.join(script_dir, "inputs")
+    ad_dir = os.path.join(script_dir, "ActiveDirectory_input")
+
+    clients = ['Northview', 'Synovus', 'Gateway', 'Other']
+    available_clients = []
+
+    for client in clients:
+        client_data = {'name': client, 'ad_file': None, 'service_file': None, 'user_mgmt_file': None, 'people_file': None}
+
+        # Check for AD files
+        ad_client_dir = os.path.join(ad_dir, client)
+        if os.path.exists(ad_client_dir):
+            ad_path = find_latest_file(ad_client_dir, "*_SANITIZED.csv")
+            if not ad_path:
+                ad_path = find_latest_file(ad_client_dir, "*.csv")
+            client_data['ad_file'] = ad_path
+
+        # Check for input files
+        client_input_dir = os.path.join(inputs_dir, client)
+        if os.path.exists(client_input_dir):
+            service_path = find_latest_file(os.path.join(client_input_dir, "service_overview"), "*.csv")
+            user_mgmt_path = find_latest_file(os.path.join(client_input_dir, "user_management"), "*.csv")
+            people_path = find_latest_file(os.path.join(client_input_dir, "people_database"), "*.csv")
+            client_data['service_file'] = service_path
+            client_data['user_mgmt_file'] = user_mgmt_path
+            client_data['people_file'] = people_path
+        # Only include clients with at least AD data
+        if client_data['ad_file']:
+            available_clients.append(client_data)
+
+    return available_clients
+
+def select_client_for_analysis():
+    """Let user select which client to analyze"""
+    available_clients = scan_available_clients()
+
+    if not available_clients:
+        print("❌ No clients with AD data found!")
+        return None, None, None, None, None
+
+    print("\n📋 AVAILABLE CLIENTS FOR ANALYSIS:")
+    print("=" * 60)
+
+    for i, client in enumerate(available_clients, 1):
+        print(f"{i}. {client['name'].upper()}")
+        print(f"   📂 AD File: {'✅' if client['ad_file'] else '❌'} {os.path.basename(client['ad_file']) if client['ad_file'] else 'Not found'}")
+        print(f"   📋 Service Overview: {'✅' if client['service_file'] else '❌'} {os.path.basename(client['service_file']) if client['service_file'] else 'Not found'}")
+        print(f"   👥 User Management: {'✅' if client['user_mgmt_file'] else '❌'} {os.path.basename(client['user_mgmt_file']) if client['user_mgmt_file'] else 'Not found'}")
+        print(f"   🗃️ People Database: {'✅' if client['people_file'] else '❌'} {os.path.basename(client['people_file']) if client['people_file'] else 'Not found'}")
+
+        # Show data completeness
+        complete_data = client['ad_file'] and client['service_file'] and client['user_mgmt_file']
+        partial_data = client['ad_file'] and (client['service_file'] or client['user_mgmt_file'])
+
+        if complete_data:
+            print(f"   🎯 Status: COMPLETE DATA - Full analysis available")
+        elif partial_data:
+            print(f"   ⚠️  Status: PARTIAL DATA - Limited analysis available")
+        else:
+            print(f"   ❌ Status: AD ONLY - Very limited analysis")
+        print()
+
+    while True:
+        try:
+            choice = int(input(f"Select client for analysis [1-{len(available_clients)}]: ")) - 1
+            if 0 <= choice < len(available_clients):
+                selected = available_clients[choice]
+                print(f"\n✅ Selected: {selected['name'].upper()}")
+
+                # Show selected files
+                print(f"📁 INPUT SOURCES:")
+                print(f"  📂 Active Directory: {os.path.basename(selected['ad_file'])} (from {selected['name']})")
+                print(f"  📋 Service Overview: {os.path.basename(selected['service_file']) if selected['service_file'] else 'Not available'} (from inputs folder)")
+                print(f"  👥 User Management: {os.path.basename(selected['user_mgmt_file']) if selected['user_mgmt_file'] else 'Not available'} (from inputs folder)")
+                print(f"  🗃️ People Database: {os.path.basename(selected['people_file']) if selected['people_file'] else 'Not available'} (from inputs folder)")
+
+                return selected['ad_file'], selected['service_file'], selected['user_mgmt_file'], selected['people_file'], selected['name']
+            else:
+                print(f"❌ Please enter a number between 1 and {len(available_clients)}")
+        except ValueError:
+            print("❌ Please enter a valid number")
+        except KeyboardInterrupt:
+            print("\n🛑 Analysis cancelled by user")
+            return None, None, None, None, None
+
 def main():
     """Main execution function"""
-
-    # Input directories
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    ad_input_dir = os.path.join(script_dir, "ActiveDirectory_input")
-    service_input_dir = os.path.join(script_dir, "service_overview_input")
-    user_mgmt_input_dir = os.path.join(script_dir, "user_management_input")
 
-    # Fallback to original paths if input directories don't exist or are empty
-    base_path = "/Users/jacquesbotha/RiderProjects/Node2-Spikefli/data/NorthView"
+    # Let user select which client to analyze
+    ad_path, service_path, user_mgmt_path, people_path, client = select_client_for_analysis()
 
-    # Try to find files in input directories first, then fallback
-    ad_path = find_latest_file(ad_input_dir, "*.csv")
     if not ad_path:
-        ad_path = os.path.join(base_path, "Northview ActiveDirectory.csv")
+        # Fallback to original structure
+        ad_input_dir = os.path.join(script_dir, "ActiveDirectory_input")
+        service_input_dir = os.path.join(script_dir, "service_overview_input")
+        user_mgmt_input_dir = os.path.join(script_dir, "user_management_input")
+        base_path = "/Users/jacquesbotha/RiderProjects/Node2-Spikefli/data/NorthView"
 
-    service_path = find_latest_file(service_input_dir, "*.csv")
-    if not service_path:
-        service_path = os.path.join(base_path, "Service_Overview_202512 (7).csv")
+        print(f"📁 INPUT SOURCES:")
 
-    user_mgmt_path = find_latest_file(user_mgmt_input_dir, "*.csv")
-    if not user_mgmt_path:
-        user_mgmt_path = os.path.join(base_path, "UserManagement.csv")
+        # Try to find files in input directories first, then fallback
+        ad_path = find_latest_file(ad_input_dir, "*_SANITIZED.csv")
+        if not ad_path:
+            ad_path = find_latest_file(ad_input_dir, "*.csv")
+        if not ad_path:
+            ad_path = os.path.join(base_path, "Northview ActiveDirectory.csv")
+            print(f"  📂 Active Directory: {os.path.basename(ad_path)} (fallback location)")
+        else:
+            print(f"  🔄 Active Directory: {os.path.basename(ad_path)} (from input folder)")
 
-    people_path = os.path.join(base_path, "PeopleGeneral.csv")
-
-    # Print file source information
-    print("📁 INPUT SOURCES:")
-    if ad_path and ad_input_dir in ad_path:
-        print(f"  🔄 Active Directory: {os.path.basename(ad_path)} (from input folder)")
-    else:
-        print(f"  📂 Active Directory: {ad_path} (fallback location)")
-
-    if service_path and service_input_dir in service_path:
+        service_path = find_latest_file(service_input_dir, "*.csv")
+        if not service_path:
+            service_path = os.path.join(base_path, "Service_Overview_202512 (7).csv")
         print(f"  🔄 Service Overview: {os.path.basename(service_path)} (from input folder)")
-    else:
-        print(f"  📂 Service Overview: {service_path} (fallback location)")
 
-    if user_mgmt_path and user_mgmt_input_dir in user_mgmt_path:
+        user_mgmt_path = find_latest_file(user_mgmt_input_dir, "*.csv")
+        if not user_mgmt_path:
+            user_mgmt_path = os.path.join(base_path, "UserManagement.csv")
         print(f"  🔄 User Management: {os.path.basename(user_mgmt_path)} (from input folder)")
-    else:
-        print(f"  📂 User Management: {user_mgmt_path} (fallback location)")
 
-    print(f"  📂 People Database: {people_path}")
     print()
 
-    # Check if files exist
+    # Check if critical files exist
+    critical_files = [("Active Directory", ad_path), ("Service Overview", service_path), ("User Management", user_mgmt_path)]
     missing_files = []
-    for name, path in [("Active Directory", ad_path), ("Service Overview", service_path), ("People Database", people_path), ("User Management", user_mgmt_path)]:
-        if not os.path.exists(path):
+
+    for name, path in critical_files:
+        if not path or not os.path.exists(path):
             missing_files.append(f"{name}: {path}")
 
     if missing_files:
@@ -912,7 +1005,7 @@ def main():
 
     # Run analysis
     analyzer = SpikeFliDataAnalyzer()
-    analyzer.run_full_analysis(ad_path, service_path, people_path, user_mgmt_path)
+    analyzer.run_full_analysis(ad_path, service_path, people_path, user_mgmt_path, client)
 
 if __name__ == "__main__":
     main()

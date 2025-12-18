@@ -28,7 +28,7 @@ def get_customer_id():
         else:
             print("❌ Please enter exactly 3 digits (e.g., 096, 057, 123)")
 
-def find_latest_worst_case_file():
+def find_latest_worst_case_file(client_name=None):
     """Find the most recent worst case mismatches CSV file"""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     output_dir = os.path.join(script_dir, "output")
@@ -36,26 +36,34 @@ def find_latest_worst_case_file():
     if not os.path.exists(output_dir):
         return None
 
+    # Search in client folder if specified
+    if client_name:
+        client_output_dir = os.path.join(output_dir, client_name)
+        if not os.path.exists(client_output_dir):
+            return None
+        search_dir = client_output_dir
+    else:
+        search_dir = output_dir
+
     # Find latest worst case file
-    worst_case_files = [f for f in os.listdir(output_dir) if f.startswith('worst_case_mismatches_') and f.endswith('.csv')]
+    worst_case_files = [f for f in os.listdir(search_dir) if f.startswith('worst_case_mismatches_') and f.endswith('.csv')]
 
     if not worst_case_files:
         return None
 
-    latest_file = max(worst_case_files, key=lambda x: os.path.getmtime(os.path.join(output_dir, x)))
-    return os.path.join(output_dir, latest_file)
+    latest_file = max(worst_case_files, key=lambda x: os.path.getmtime(os.path.join(search_dir, x)))
+    return os.path.join(search_dir, latest_file)
 
-def generate_worst_case_fix_sql(customer_id=None):
+def generate_worst_case_fix_sql(client_name=None):
     """Generate SQL to fix worst case mismatches"""
 
     print("🔧 GENERATING WORST CASE MISMATCH FIX SQL...")
 
-    # Get customer ID if not provided
-    if customer_id is None:
-        customer_id = get_customer_id()
+    # Get customer ID for database operations
+    customer_id = get_customer_id()
 
-    # Find latest worst case file
-    worst_case_file = find_latest_worst_case_file()
+    # Find latest worst case file in client folder
+    worst_case_file = find_latest_worst_case_file(client_name)
 
     if not worst_case_file:
         print("❌ No worst case mismatches file found!")
@@ -76,9 +84,18 @@ def generate_worst_case_fix_sql(customer_id=None):
         print("✅ No worst case mismatches found - everything is working well!")
         return True
 
-    # Generate output filename
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_path = os.path.join("output", f"Worst_Case_Fixes_{timestamp}.sql")
+    # Generate output filename using client-organized structure
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_dir = os.path.join(script_dir, "output")
+
+    if client_name:
+        client_output_dir = os.path.join(output_dir, client_name)
+        os.makedirs(client_output_dir, exist_ok=True)
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_path = os.path.join(client_output_dir, f"Worst_Case_Fixes_{timestamp}.sql")
+    else:
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        output_path = os.path.join(output_dir, f"Worst_Case_Fixes_{timestamp}.sql")
 
     sql_statements = []
 
@@ -105,9 +122,9 @@ def generate_worst_case_fix_sql(customer_id=None):
         service_user = escape_sql_string(row['service_clean_name'])
         ad_user = escape_sql_string(row['ad_user'])
 
-        # Format phone number with dashes (XXX-XXX-XXXX format for database)
+        # Use plain phone number format (no dashes for AssetID)
         if len(phone) == 10 and phone.isdigit():
-            formatted_phone = f"{phone[:3]}-{phone[3:6]}-{phone[6:]}"
+            formatted_phone = phone  # Keep as plain digits
         else:
             formatted_phone = phone  # Use as-is if not standard 10-digit format
 
@@ -119,7 +136,8 @@ def generate_worst_case_fix_sql(customer_id=None):
         sql_statements.append(f"    sd.Username = LEFT(p.username, 20)")
         sql_statements.append(f"FROM C_{customer_id}_ServiceDetails sd")
         sql_statements.append(f"INNER JOIN C_{customer_id}_People p ON p.username = '{ad_user}'")
-        sql_statements.append(f"WHERE sd.AssetID = '{formatted_phone}';")
+        sql_statements.append(f"WHERE sd.AssetID = '{formatted_phone}'")
+        sql_statements.append(f"  AND sd.Username = '{service_user}';  -- Only update records with the old user")
         sql_statements.append("")
         fix_count += 1    # Verification queries
     sql_statements.append("-- ================================================================================")
@@ -158,6 +176,51 @@ def generate_worst_case_fix_sql(customer_id=None):
         print(f"❌ Error saving SQL file: {e}")
         return False
 
+def select_client_for_fixes():
+    """Let user select which client to generate fixes for"""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_dir = os.path.join(script_dir, "output")
+
+    # Find client folders that have analysis results
+    available_clients = []
+    if os.path.exists(output_dir):
+        for item in os.listdir(output_dir):
+            client_dir = os.path.join(output_dir, item)
+            if os.path.isdir(client_dir) and not item.startswith('.'):
+                # Check if this client has worst case files
+                import glob
+                worst_case_files = glob.glob(os.path.join(client_dir, "worst_case_mismatches_*.csv"))
+                if worst_case_files:
+                    available_clients.append({'name': item, 'files': worst_case_files})
+
+    if not available_clients:
+        print("❌ No client analysis results found!")
+        print("Run comprehensive analysis first to generate mismatch data.")
+        return None
+
+    print("\n📋 AVAILABLE CLIENTS WITH ANALYSIS DATA:")
+    print("=" * 60)
+
+    for i, client in enumerate(available_clients, 1):
+        print(f"{i}. {client['name'].upper()}")
+        print(f"   📊 Analysis Files: {len(client['files'])} worst case file(s)")
+        print()
+
+    while True:
+        try:
+            choice = int(input(f"Select client for fixes [1-{len(available_clients)}]: ")) - 1
+            if 0 <= choice < len(available_clients):
+                selected = available_clients[choice]
+                print(f"\n✅ Selected: {selected['name'].upper()}")
+                return selected['name']
+            else:
+                print(f"❌ Please enter a number between 1 and {len(available_clients)}")
+        except ValueError:
+            print("❌ Please enter a valid number")
+        except KeyboardInterrupt:
+            print("\n🛑 Fix generation cancelled by user")
+            return None
+
 def main():
     """Main execution function"""
 
@@ -165,7 +228,12 @@ def main():
     print("🔧 SPIKEFLI WORST CASE MISMATCH FIX GENERATOR")
     print("=" * 60)
 
-    result = generate_worst_case_fix_sql()
+    # Select client for fixes
+    client = select_client_for_fixes()
+    if not client:
+        return
+
+    result = generate_worst_case_fix_sql(client)
 
     if result:
         print("\n✅ WORST CASE FIX SQL GENERATED!")

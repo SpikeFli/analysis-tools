@@ -24,6 +24,34 @@ def escape_sql_string(value):
     # Convert to string and escape single quotes by doubling them
     return str(value).replace("'", "''")
 
+def clean_phone_number(phone_value):
+    """Clean phone number by removing .0 suffix if present"""
+    if not phone_value or pd.isna(phone_value):
+        return ""
+
+    phone_str = str(phone_value).strip()
+
+    # Remove .0 suffix if it exists (pandas float conversion artifact)
+    if phone_str.endswith('.0'):
+        phone_str = phone_str[:-2]
+
+    # Return empty if not a valid phone number
+    if phone_str in ['', 'nan', 'None']:
+        return ""
+
+    return phone_str
+
+def convert_boolean_field(value):
+    """Convert boolean field to 1/0 format for People table compatibility"""
+    if pd.isna(value) or str(value).strip() == '' or str(value).strip().lower() == 'nan':
+        return 0
+
+    value_str = str(value).strip().upper()
+    if value_str in ['Y', 'YES', '1', 'TRUE']:
+        return 1
+
+    return 0
+
 def get_customer_id():
     """Prompt user for the customer ID digits"""
     while True:
@@ -93,9 +121,14 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None):
         cn = str(row.get('cn', '')).strip()
         display_name = str(row.get('DisplayName', '')).strip()
         enabled = str(row.get('Enabled', '1')).strip()
-        phone1 = str(row.get('telephoneNumber', '')).strip()
-        phone2 = str(row.get('mobile', '')).strip()
+        phone1 = clean_phone_number(row.get('telephoneNumber', ''))
+        phone2 = clean_phone_number(row.get('mobile', ''))
         email = str(row.get('UserPrincipalName', '')).strip()
+
+        # Get organizational fields if available (convert to 1/0 format)
+        is_manager = convert_boolean_field(row.get('IsManager', ''))
+        is_executive = convert_boolean_field(row.get('IsExecutive', ''))
+        mgmt_level = str(row.get('ManagementLevel', '')).strip()
 
         if not cn or cn == 'nan':
             continue
@@ -105,6 +138,7 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None):
         display_name_escaped = escape_sql_string(display_name)
         phone1_escaped = escape_sql_string(phone1)
         phone2_escaped = escape_sql_string(phone2)
+        mgmt_level_escaped = escape_sql_string(mgmt_level)
 
         # Determine status - default to Active since the legacy parser is broken
         status = "Active"
@@ -114,22 +148,26 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None):
         # Generate status update
         sql_statements.append(f"-- Update {cn_escaped} ({display_name_escaped})")
         sql_statements.append(f"UPDATE C_{customer_id}_People")
-        sql_statements.append(f"SET status = '{status}',")
+
+        # Build SET clause parts
+        set_parts = [f"status = '{status}'"]
 
         # Add phone updates if we have phone numbers
-        phone_updates = []
         if phone1 and phone1 != 'nan':
-            phone_updates.append(f"    phone1 = '{phone1_escaped}'")
+            set_parts.append(f"phone1 = '{phone1_escaped}'")
             phone_count += 1
         if phone2 and phone2 != 'nan':
-            phone_updates.append(f"    phone2 = '{phone2_escaped}'")
+            set_parts.append(f"phone2 = '{phone2_escaped}'")
             phone_count += 1
 
-        if phone_updates:
-            sql_statements.append("    " + ",\n".join(phone_updates) + ",")
+        # Add organizational field updates (use 1/0 format matching People Table)
+        set_parts.append(f"isMgr = {is_manager}")
+        set_parts.append(f"isExec = {is_executive}")
+        if mgmt_level and mgmt_level != 'nan' and mgmt_level != '':
+            set_parts.append(f"mgrlevel = '{mgmt_level_escaped}'")
 
-        # Only update Modified timestamp if status is actually changing
-        sql_statements.append(f"    Modified = CASE WHEN status != 'Active' THEN GETDATE() ELSE Modified END")
+        # Join all SET parts
+        sql_statements.append("SET " + ",\n    ".join(set_parts))
         sql_statements.append(f"WHERE userid = '{cn_escaped}';")
         sql_statements.append("")
 
@@ -150,8 +188,8 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None):
         cn = str(row.get('cn', '')).strip()
         display_name = str(row.get('DisplayName', '')).strip()
         enabled = str(row.get('Enabled', '1')).strip()
-        phone1 = str(row.get('telephoneNumber', '')).strip()
-        phone2 = str(row.get('mobile', '')).strip()
+        phone1 = clean_phone_number(row.get('telephoneNumber', ''))
+        phone2 = clean_phone_number(row.get('mobile', ''))
         email = str(row.get('UserPrincipalName', '')).strip()
         department = str(row.get('Department', '')).strip()
 
@@ -299,33 +337,72 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None):
         print(f"❌ Error writing SQL file: {e}")
         return False
 
+def find_latest_file(directory, pattern):
+    """Find the latest file matching pattern in directory"""
+    if not os.path.exists(directory):
+        return None
+
+    import glob
+    files = glob.glob(os.path.join(directory, pattern))
+    if files:
+        return max(files, key=os.path.getmtime)
+    return None
+
+def select_client_for_sql():
+    """Let user select which client to generate SQL for"""
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    ad_dir = os.path.join(script_dir, "ActiveDirectory_input")
+
+    clients = ['Northview', 'Synovus', 'Gateway', 'Other']
+    available_clients = []
+
+    for client in clients:
+        ad_client_dir = os.path.join(ad_dir, client)
+        if os.path.exists(ad_client_dir):
+            ad_path = find_latest_file(ad_client_dir, "*_SANITIZED.csv")
+            if ad_path:
+                available_clients.append({'name': client, 'ad_file': ad_path})
+
+    if not available_clients:
+        print("❌ No clients with sanitized AD data found!")
+        print("Run the sanitize AD router first to create sanitized CSV files.")
+        return None, None
+
+    print("\n📋 AVAILABLE CLIENTS FOR SQL GENERATION:")
+    print("=" * 60)
+
+    for i, client in enumerate(available_clients, 1):
+        print(f"{i}. {client['name'].upper()}")
+        print(f"   📂 AD File: ✅ {os.path.basename(client['ad_file'])}")
+        print()
+
+    while True:
+        try:
+            choice = int(input(f"Select client for SQL generation [1-{len(available_clients)}]: ")) - 1
+            if 0 <= choice < len(available_clients):
+                selected = available_clients[choice]
+                print(f"\n✅ Selected: {selected['name'].upper()}")
+                print(f"📁 Using sanitized AD file: {os.path.basename(selected['ad_file'])}")
+                return selected['ad_file'], selected['name']
+            else:
+                print(f"❌ Please enter a number between 1 and {len(available_clients)}")
+        except ValueError:
+            print("❌ Please enter a valid number")
+        except KeyboardInterrupt:
+            print("\n🛑 SQL generation cancelled by user")
+            return None, None
+
 def main():
     """Main execution function"""
 
-    # Look for sanitized AD CSV
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-
-    # Check for sanitized file first
-    sanitized_files = [
-        os.path.join(script_dir, "ActiveDirectory_input", "Northview_ActiveDirectory_SANITIZED.csv"),
-        "/Users/jacquesbotha/RiderProjects/Node2-Spikefli/data/NorthView/Northview_ActiveDirectory_SANITIZED.csv",
-        "/Users/jacquesbotha/RiderProjects/Node2-Spikefli/analysis-tools/ActiveDirectory_input/Northview_ActiveDirectory_SANITIZED.csv"
-    ]
-
-    input_file = None
-    for path in sanitized_files:
-        if os.path.exists(path):
-            input_file = path
-            break
+    # Let user select which client to generate SQL for
+    input_file, client = select_client_for_sql()
 
     if not input_file:
-        print("❌ No sanitized Active Directory CSV found!")
-        print("Run the sanitize_ad_csv.py script first to create a clean CSV file.")
         return
 
-    print(f"📁 Using sanitized AD file: {os.path.basename(input_file)}")
-
     # Generate SQL in the output directory
+    script_dir = os.path.dirname(os.path.abspath(__file__))
     output_dir = os.path.join(script_dir, "output")
     os.makedirs(output_dir, exist_ok=True)
 

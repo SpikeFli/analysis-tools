@@ -61,20 +61,26 @@ show_menu() {
     echo "6. 🛠️  Fix service statuses (mark expired/active services)"
     echo "7. 📝 Generate expired service fixes (mark services not in AD as expired)"
     echo "8. 📞 Generate phone reassignment fixes (fix mismatched users)"
-    echo "9. 📄 Generate backup scripts"
-    echo "10. ❌ Exit"
+    echo "9. � Generate phone assignment fixes (create new users + reassign phones)"
+    echo "10. 📄 Generate backup scripts"
+    echo "11. 🧹 Sanitize reviewed CSV (EXPIRED/GENERAL USE)"
+    echo "12. ❌ Exit"
     echo ""
 }
 
 # Function to sanitize AD
 sanitize_ad() {
     print_info "Starting Active Directory sanitization..."
-    python3 sanitize_ad_csv.py
+    print_info "Using smart client detection router..."
+    python3 sanitize_ad_router.py
     if [ $? -eq 0 ]; then
         print_status "AD sanitization completed successfully"
         return 0
     else
         print_error "AD sanitization failed"
+        print_warning "You can also run client-specific sanitizers:"
+        print_warning "- Northview: python3 sanitize_ad_csv.py"
+        print_warning "- Synovus: python3 sanitize_synovus_ad.py"
         return 1
     fi
 }
@@ -161,7 +167,7 @@ generate_backups() {
 main() {
     while true; do
         show_menu
-        echo -n "Enter your choice [1-10]: "
+        echo -n "Enter your choice [1-12]: "
         read choice
 
         case $choice in
@@ -232,14 +238,22 @@ main() {
                 python3 generate_phone_reassignment_fixes.py
                 ;;
             9)
-                generate_backups
+                print_info "Generating phone assignment fix SQL..."
+                python3 generate_phone_assignment_fixes.py
                 ;;
             10)
+                generate_backups
+                ;;
+            11)
+                print_info "Sanitizing reviewed CSV (EXPIRED/GENERAL USE)..."
+                python3 sanitize_reviewed_csv.py
+                ;;
+            12)
                 print_info "Goodbye!"
                 exit 0
                 ;;
             *)
-                print_error "Invalid choice. Please enter 1-10."
+                print_error "Invalid choice. Please enter 1-12."
                 ;;
         esac
 
