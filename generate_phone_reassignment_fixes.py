@@ -111,25 +111,23 @@ def generate_phone_reassignment_fix_sql(customer_id=None):
 
         sql_statements.append(f"-- Fix phone {phone_number}: {old_user} → {new_user}")
 
-        # Update ServiceDetails to use the current AD user
-        # Method 1: Update by phone number (AssetID)
+        # Update ServiceDetails to use the current AD user (ONLY current months)
         sql_statements.append(f"UPDATE C_{customer_id}_ServiceDetails")
-        sql_statements.append(f"SET Username = '{new_user}'")
-        sql_statements.append(f"WHERE AssetID = '{phone_clean}' AND Username = '{old_user}';")
+        sql_statements.append(f"SET Username = '{new_user}',")
+        sql_statements.append(f"    UserRef_Type = 'Phone Reassign'")
+        sql_statements.append(f"WHERE AssetID = '{phone_clean}'")
+        sql_statements.append(f"  AND Username = '{old_user}'")
+        sql_statements.append(f"  AND DateRef IN ('202512', '202511');  -- Only current months")
         sql_statements.append("")
 
-        # Method 2: Also update any records that might have different formatting
-        sql_statements.append(f"-- Also handle any formatting variations for {phone_number}")
+        # Handle any formatting variations (ONLY current months)
+        sql_statements.append(f"-- Also handle formatting variations for {phone_number}")
         sql_statements.append(f"UPDATE C_{customer_id}_ServiceDetails")
-        sql_statements.append(f"SET Username = '{new_user}'")
-        sql_statements.append(f"WHERE AssetID IN ('{phone_number}', '{phone_clean}') AND Username = '{old_user}';")
-        sql_statements.append("")
-
-        # Method 3: Update People table if phone1 or phone2 matches
-        sql_statements.append(f"-- Update People table for phone {phone_number}")
-        sql_statements.append(f"UPDATE C_{customer_id}_People")
-        sql_statements.append(f"SET username = '{new_user}', Modified = GETDATE()")
-        sql_statements.append(f"WHERE (phone1 = '{phone_clean}' OR phone2 = '{phone_clean}') AND username = '{old_user}';")
+        sql_statements.append(f"SET Username = '{new_user}',")
+        sql_statements.append(f"    UserRef_Type = 'Phone Reassign'")
+        sql_statements.append(f"WHERE AssetID IN ('{phone_number}', '{phone_clean}')")
+        sql_statements.append(f"  AND Username = '{old_user}'")
+        sql_statements.append(f"  AND DateRef IN ('202512', '202511');  -- Only current months")
         sql_statements.append("")
 
         fix_count += 1
@@ -156,9 +154,36 @@ def generate_phone_reassignment_fix_sql(customer_id=None):
         sql_statements.append(f"WHERE phone1 = '{phone_clean}' OR phone2 = '{phone_clean}';")
         sql_statements.append("")
 
-    sql_statements.append("COMMIT;")
+    # Add verification and transaction control
+    sql_statements.append("-- ===============================================================================")
+    sql_statements.append("-- FINAL VERIFICATION & TRANSACTION CONTROL")
+    sql_statements.append("-- ===============================================================================")
+    sql_statements.append("")
+    sql_statements.append("-- Count total updates made")
+    sql_statements.append(f"SELECT COUNT(*) as total_reassignments")
+    sql_statements.append(f"FROM C_{customer_id}_ServiceDetails")
+    sql_statements.append(f"WHERE UserRef_Type = 'Phone Reassign'")
+    sql_statements.append(f"  AND DateRef IN ('202512', '202511');")
+    sql_statements.append("")
+    sql_statements.append("-- Show sample of reassigned phones")
+    sql_statements.append(f"SELECT TOP 10 AssetID, Username, UserRef_Type, DateRef")
+    sql_statements.append(f"FROM C_{customer_id}_ServiceDetails")
+    sql_statements.append(f"WHERE UserRef_Type = 'Phone Reassign'")
+    sql_statements.append(f"  AND DateRef IN ('202512', '202511')")
+    sql_statements.append(f"ORDER BY AssetID;")
+    sql_statements.append("")
+    sql_statements.append("-- ===============================================================================")
+    sql_statements.append("-- SAFETY CONTROLS")
+    sql_statements.append("-- ===============================================================================")
+    sql_statements.append("")
+    sql_statements.append(f"PRINT 'Phone reassignment completed - {fix_count} fixes applied';")
+    sql_statements.append("PRINT 'Review results above before committing';")
+    sql_statements.append("")
+    sql_statements.append("-- COMMIT;")
+    sql_statements.append("-- ROLLBACK;")
     sql_statements.append("")
     sql_statements.append(f"-- Summary: Fixed {fix_count} phone reassignments")
+    sql_statements.append("-- Only updated current months (202512, 202511)")
     sql_statements.append("-- Services now assigned to correct Active Directory users!")
 
     # Write SQL file
