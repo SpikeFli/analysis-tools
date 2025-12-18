@@ -19,14 +19,22 @@ def escape_sql_string(value):
 def get_customer_id():
     """Prompt user for the customer ID digits"""
     while True:
-        customer_digits = input("🔢 Enter the last 3 digits of the customer ID (e.g., 096): ").strip()
+        try:
+            customer_digits = input("🔢 Enter the last 3 digits of the customer ID (e.g., 096): ").strip()
 
-        if len(customer_digits) == 3 and customer_digits.isdigit():
-            customer_id = f"0000000{customer_digits}"
-            print(f"  ✅ Using customer ID: {customer_id}")
-            return customer_id
-        else:
-            print("❌ Please enter exactly 3 digits (e.g., 096, 057, 123)")
+            if len(customer_digits) == 3 and customer_digits.isdigit():
+                customer_id = f"0000000{customer_digits}"
+                print(f"  ✅ Using customer ID: {customer_id}")
+                return customer_id
+            else:
+                print("❌ Please enter exactly 3 digits (e.g., 096, 057, 123)")
+        except EOFError:
+            print("\n❌ No input available - cannot determine customer ID")
+            print("❌ Please run this script interactively or provide customer ID")
+            return None
+        except KeyboardInterrupt:
+            print("\n🛑 Cancelled by user")
+            return None
 
 def find_latest_worst_case_file(client_name=None):
     """Find the most recent worst case mismatches CSV file"""
@@ -61,6 +69,8 @@ def generate_worst_case_fix_sql(client_name=None):
 
     # Get customer ID for database operations
     customer_id = get_customer_id()
+    if not customer_id:
+        return False
 
     # Find latest worst case file in client folder
     worst_case_file = find_latest_worst_case_file(client_name)
@@ -206,6 +216,12 @@ def select_client_for_fixes():
         print(f"   📊 Analysis Files: {len(client['files'])} worst case file(s)")
         print()
 
+    # Auto-select if only one client
+    if len(available_clients) == 1:
+        selected = available_clients[0]
+        print(f"✅ Auto-selected: {selected['name'].upper()} (only client with worst case issues)")
+        return selected['name']
+
     while True:
         try:
             choice = int(input(f"Select client for fixes [1-{len(available_clients)}]: ")) - 1
@@ -217,6 +233,12 @@ def select_client_for_fixes():
                 print(f"❌ Please enter a number between 1 and {len(available_clients)}")
         except ValueError:
             print("❌ Please enter a valid number")
+        except EOFError:
+            # Handle EOF when input is piped or no interactive terminal
+            print("\n❌ No input available - using first client")
+            selected = available_clients[0]
+            print(f"✅ Auto-selected: {selected['name'].upper()}")
+            return selected['name']
         except KeyboardInterrupt:
             print("\n🛑 Fix generation cancelled by user")
             return None

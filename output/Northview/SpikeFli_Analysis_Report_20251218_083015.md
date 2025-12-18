@@ -1,18 +1,18 @@
 # SpikeFli Data Analysis Report
 
-**Generated:** December 17, 2025 at 08:52 AM
+**Generated:** December 18, 2025 at 08:30 AM
 
 ---
 
 ## 🎯 Key Metrics Summary
 
-### 📱 Phone Number Analysis (165 phones analyzed)
+### 📱 Phone Number Analysis (167 phones analyzed)
 
 | Metric | Count | Percentage | Status |
 |--------|-------|------------|--------|
-| **Users Match Correctly** | **154** | **93.3%** | ✅ Good |
-| **User Mismatches** | **11** | **6.7%** | 🚨 Needs Fix |
-| Status Consistency | 165 | 100.0% | ✅ Good |
+| **Users Match Correctly** | **127** | **76.0%** | ✅ Good |
+| **User Mismatches** | **40** | **24.0%** | 🚨 Needs Fix |
+| Status Consistency | 167 | 100.0% | ✅ Good |
 
 **🔍 What User Mismatches Mean:**
 When a phone number shows **different users** in Service Overview vs Active Directory:
@@ -22,12 +22,12 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 - **Impact:** Billing/services assigned to wrong person
 - **Solution:** Update Service Overview to match Active Directory
 
-### 🚨 Critical Status Issues (128 total)
+### 🚨 Critical Status Issues (329 total)
 
 | Issue Type | Count | Impact | Priority |
 |------------|-------|--------|----------|
-| Phone Assignment Issues | 1 | Active employees can't access their phones | 🔴 High |
-| **Should be EXPIRED** | **127** | **Paying for unused services** | **🔴 Critical** |
+| Phone Assignment Issues | 29 | Active employees can't access their phones | 🔴 High |
+| **Should be EXPIRED** | **300** | **Paying for unused services** | **🔴 Critical** |
 | Correctly EXPIRED | 0 | No action needed | ✅ Good |
 
 **🔍 What These Issues Mean:**
@@ -38,21 +38,21 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 
 | Metric | Count | Percentage |
 |--------|-------|------------|
-| Total Users | 629 | 100% |
-| **Enabled Users** | **524** | **83.3%** |
-| Disabled Users | 105 | 16.7% |
-| Users with Mobile | 232 | 36.9% |
-| Users with Phone | 203 | 32.3% |
+| Total Users | 630 | 100% |
+| **Enabled Users** | **523** | **83.0%** |
+| Disabled Users | 107 | 17.0% |
+| Users with Mobile | 227 | 36.0% |
+| Users with Phone | 203 | 32.2% |
 
 ## 👥 User Management System Analysis
 
 | Metric | Count | Percentage |
 |--------|-------|------------|
-| Total User Records | 2683 | 100% |
-| **Active Users** | **629** | **23.4%** |
-| Expired Users | 2054 | 76.6% |
+| Total User Records | 2684 | 100% |
+| **Active Users** | **630** | **23.5%** |
+| Expired Users | 2054 | 76.5% |
 | AD-Sourced Records | 2598 | 96.8% |
-| Other Sources | 85 | 3.2% |
+| Other Sources | 86 | 3.2% |
 
 ## 🗃️ People Database Analysis
 
@@ -69,11 +69,11 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 
 | Metric | Count |
 |--------|-------|
-| Total Entries with Users | 325 |
-| Active Entries | 323 |
-| Expired Entries | 34 |
+| Total Entries with Users | 501 |
+| Active Entries | 492 |
+| Expired Entries | 63 |
 
-## 📞 Phone Number Cross-Reference Analysis (165 phones matched)
+## 📞 Phone Number Cross-Reference Analysis (167 phones matched)
 
 **THIS IS THE CORE ANALYSIS:** Shows how phone numbers match between Service Overview and Active Directory:
 
@@ -81,11 +81,11 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 |--------------|----------------------|---------|-------------|-------------------|
 | 2048077564 | Refik Muheljic | Refik Muheljic | ✅ YES | ✅ YES |
 | 2048900224 | Paula Raiado | Paula Raiado | ✅ YES | ✅ YES |
-| 2048900255 | Ignacio Gonzalez | Ignacio Gonzalez | ✅ YES | ✅ YES |
+| 2048900255 | Darrell Everard | Ignacio Gonzalez | ❌ NO | ❌ NO |
 | 2048900259 | Jesus Donat-Gisbert | Jesus Donat-Gisbert | ✅ YES | ✅ YES |
-| 2048900266 | Bohdan Miniailo | Bohdan Miniailo | ✅ YES | ✅ YES |
+| 2048900266 | Werner Franz | Bohdan Miniailo | ❌ NO | ❌ NO |
 | 2048900287 | Vadym Melnyk | Vadym Melnyk | ✅ YES | ✅ YES |
-| 2048900302 | Roxana Besora | Roxana Besora | ✅ YES | ✅ YES |
+| 2048900302 | Roxana Echavarria-Besora | Roxana Besora | ❌ NO | ❌ NO |
 | 2048900307 | Danilo Cairo | Danilo Cairo | ✅ YES | ✅ YES |
 | 2048900311 | Francisco Rodriguez | Francisco Rodriguez | ✅ YES | ✅ YES |
 | 2048900312 | Anthony Kamal | Anthony Kamal | ✅ YES | ✅ YES |
@@ -94,14 +94,14 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 2048900329 | Johnathan Martens | Johnathan Martens | ✅ YES | ✅ YES |
 | 2048900342 | Eliza Leal | Eliza Leal | ✅ YES | ✅ YES |
 | 2049142049 | Danielle Wright | Danielle Wright | ✅ YES | ✅ YES |
-| 2502633335 | Christal Ritchie | Christal Ritchie | ✅ YES | ✅ YES |
-| 2503013255 | Janell Lovelace | Janell Lovelace | ✅ YES | ✅ YES |
+| 2502633335 | Shannon Magee | Christal Ritchie | ❌ NO | ❌ NO |
+| 2503013255 | Stefanie Halford | Janell Lovelace | ❌ NO | ❌ NO |
 | 2503013274 | Thomas Redden | Thomas Redden | ✅ YES | ✅ YES |
 | 2503013672 | Fausto Toraya-Madrid | Fausto Toraya-Madrid | ✅ YES | ✅ YES |
-| 2503274819 | Michael Townsend | Michael Townsend | ✅ YES | ✅ YES |
+| 2503274819 | Bradley Westergard | Michael Townsend | ❌ NO | ❌ NO |
 | 2507197496 | Sheryl Olson | Jessica Murray | ❌ NO | ✅ YES |
-| 2507197749 | Dawson Martin-Fisher | Dawson Martin-Fisher | ✅ YES | ✅ YES |
-| 3062017203 | Danielle Loverick | Danielle Loverick | ✅ YES | ✅ YES |
+| 2507197749 | Harold Greve | Dawson Martin-Fisher | ❌ NO | ❌ NO |
+| 3062017203 | Marie Gamble | Danielle Loverick | ❌ NO | ❌ NO |
 | 3065150071 | Kirk Duaine Anor | Kirk Duaine Anor | ✅ YES | ✅ YES |
 | 4033080167 | Joe Giacalone | Joe Giacalone | ✅ YES | ✅ YES |
 | 4034086397 | Langis Donnelly | Langis Donnelly | ✅ YES | ✅ YES |
@@ -118,7 +118,7 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4037953166 | Tammie Cameron | Tammie Cameron | ✅ YES | ✅ YES |
 | 4037962467 | Randy Dean | Randy Dean | ✅ YES | ✅ YES |
 | 4037962619 | Leny Cuaresma | Leny Cuaresma | ✅ YES | ✅ YES |
-| 4038018445 | Monika Garwol | Monika Garwol | ✅ YES | ✅ YES |
+| 4038018445 | Tamara Stuart | Monika Garwol | ❌ NO | ❌ NO |
 | 4038354026 | Jayson Hinds | Jayson Hinds | ✅ YES | ✅ YES |
 | 4038367248 | Adam Hobkirk | Adam Hobkirk | ✅ YES | ✅ YES |
 | 4038377224 | Brittany Freeborn | Brittany Freeborn | ✅ YES | ✅ YES |
@@ -133,49 +133,49 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4313346784 | Gail Wach | Gail Wach | ✅ YES | ✅ YES |
 | 4313376456 | Jose Castellanos | Jose Castellanos | ✅ YES | ✅ YES |
 | 5062692587 | Lyndon Murray | Lyndon Murray | ✅ YES | ✅ YES |
-| 5063783026 | Glenn Ostulano | Glenn Ostulano | ✅ YES | ✅ YES |
+| 5063783026 | Lucie Deveau | Glenn Ostulano | ❌ NO | ❌ NO |
 | 5063783541 | David Steeves | David Steeves | ✅ YES | ✅ YES |
-| 5063784157 | Gilles Gaudet | Gilles Gaudet | ✅ YES | ✅ YES |
+| 5063784157 | Leonard Weston | Gilles Gaudet | ❌ NO | ❌ NO |
 | 5063810448 | Rachelle Couture | Angela Fitzpatrick | ❌ NO | ✅ YES |
 | 5063813165 | Jackie Stewart | Jackie Stewart | ✅ YES | ✅ YES |
 | 5063815178 | Claudia Steeves | Claudia Steeves | ✅ YES | ✅ YES |
-| 5063816622 | Jayda Ballantyne | Jayda Ballantyne | ✅ YES | ✅ YES |
-| 5063819452 | Fadel Alhaddad | Fadel Alhaddad | ✅ YES | ✅ YES |
-| 5068520745 | Matthew Ellis | Matthew Ellis | ✅ YES | ✅ YES |
+| 5063816622 | Connie Doucet | Jayda Ballantyne | ❌ NO | ❌ NO |
+| 5063819452 | Phillip Greenlaw | Fadel Alhaddad | ❌ NO | ❌ NO |
+| 5068520745 | Gerald Forest | Matthew Ellis | ❌ NO | ❌ NO |
 | 5068521315 | Ramos Evangelista | Ramos Evangelista | ✅ YES | ✅ YES |
 | 5068526504 | Sheila Girouard | Sheila Girouard | ✅ YES | ✅ YES |
 | 5068669816 | Priscilla Arsenault | Priscilla Arsenault | ✅ YES | ✅ YES |
 | 5068724363 | Lisa Caissie | Lisa Caissie | ✅ YES | ✅ YES |
-| 5068750421 | Wanetta Cavanaugh | Wanetta Cavanaugh | ✅ YES | ✅ YES |
+| 5068750421 | Denis LeBlanc | Wanetta Cavanaugh | ❌ NO | ❌ NO |
 | 5068751582 | Michel Mercier | Michel Mercier | ✅ YES | ✅ YES |
 | 5873434403 | Ashley Quann | Ashley Quann | ✅ YES | ✅ YES |
 | 5873435985 | Dave Sweet | Dave Sweet | ✅ YES | ✅ YES |
 | 5873436688 | Jill Langevin | Jill Langevin | ✅ YES | ✅ YES |
-| 5873703965 | Rose Ricketts | Rose Ricketts | ✅ YES | ✅ YES |
+| 5873703965 | Connie Dietrich | Rose Ricketts | ❌ NO | ❌ NO |
 | 5873704377 | William Barton | William Barton | ✅ YES | ✅ YES |
 | 5873983046 | Rodney Bradshaw | Rodney Bradshaw | ✅ YES | ✅ YES |
 | 5873983303 | Brent Henschel | Brent Henschel | ✅ YES | ✅ YES |
-| 5874345991 | Dacoda McCaffrey | Dacoda McCaffrey | ✅ YES | ✅ YES |
-| 5874359157 | Anthony Parker | Anthony Parker | ✅ YES | ✅ YES |
+| 5874345991 | Craig Owens | Dacoda McCaffrey | ❌ NO | ❌ NO |
+| 5874359157 | Claire Livingstone | Anthony Parker | ❌ NO | ❌ NO |
 | 5874371511 | Alex Machell | Alex Machell | ✅ YES | ✅ YES |
 | 5878301876 | Ali Mirza | Alicia Eaton | ❌ NO | ✅ YES |
 | 5878391278 | Olive Anon | Olive Anon | ✅ YES | ✅ YES |
 | 5879195938 | Deanna Wight | Deanna Wight | ✅ YES | ✅ YES |
 | 6395602467 | Drew Savoie | Drew Savoie | ✅ YES | ✅ YES |
 | 6395712243 | Katie Andrade | Katie Andrade | ✅ YES | ✅ YES |
-| 7092800373 | Natasha Reid | Natasha Reid | ✅ YES | ✅ YES |
+| 7092800373 | Eric Dempsey | Natasha Reid | ❌ NO | ❌ NO |
 | 7092806432 | Labrador On-Call | Labrador On-Call | ✅ YES | ✅ YES |
-| 7093276934 | Doreen Moyst | Doreen Moyst | ✅ YES | ✅ YES |
+| 7093276934 | Thanh Vo | Doreen Moyst | ❌ NO | ❌ NO |
 | 7093303479 | Melvin Harding | Melvin Harding | ✅ YES | ✅ YES |
 | 7096311938 | Ashley Winsor | Ashley Winsor | ✅ YES | ✅ YES |
 | 7096312187 | Jon Whelan | Jon Whelan | ✅ YES | ✅ YES |
 | 7096803197 | Michael Carriere | Michael Carriere | ✅ YES | ✅ YES |
 | 7096820283 | Christa Chaulk | Christa Chaulk | ✅ YES | ✅ YES |
-| 7096820648 | Patrick Barron | Patrick Barron | ✅ YES | ✅ YES |
+| 7096820648 | Sean Keough | Patrick Barron | ❌ NO | ❌ NO |
 | 7096828800 | Darlene Rendell | Darlene Rendell | ✅ YES | ✅ YES |
 | 7096829022 | Jordan Alexander | Jordan Alexander | ✅ YES | ✅ YES |
 | 7096853163 | Mary Flynn | Mary Flynn | ✅ YES | ✅ YES |
-| 7096878394 | Joseph Noble | Jimson Millare | ❌ NO | ✅ YES |
+| 7096878394 | Joseph Noble | Joseph Noble | ✅ YES | ✅ YES |
 | 7096879177 | Julia Holden | Julia Holden | ✅ YES | ✅ YES |
 | 7096907734 | Dave King | Dave King | ✅ YES | ✅ YES |
 | 7096917677 | SJ OnCallFloater | SJ OnCallFloater | ✅ YES | ✅ YES |
@@ -184,15 +184,15 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 7096974537 | Sheila Todd | Sheila Todd | ✅ YES | ✅ YES |
 | 7097255569 | Houman Pourali | Houman Pourali | ✅ YES | ✅ YES |
 | 7097270003 | Stanley Manstan | Stanley Manstan | ✅ YES | ✅ YES |
-| 7097271437 | Oleh Viernik | Oleh Viernik | ✅ YES | ✅ YES |
+| 7097271437 | Benjamin Speed | Oleh Viernik | ❌ NO | ❌ NO |
 | 7097278900 | William Hann | William Hann | ✅ YES | ✅ YES |
 | 7097282534 | Glen Bragg | Glen Bragg | ✅ YES | ✅ YES |
-| 7097284316 | Brian James | Brian James | ✅ YES | ✅ YES |
+| 7097284316 | Tobias Lewis | Brian James | ❌ NO | ❌ NO |
 | 7097302174 | Valerie Power | Valerie Power | ✅ YES | ✅ YES |
 | 7097304884 | Katherine Graham | Menchene Mationg | ❌ NO | ✅ YES |
 | 7097714226 | Rhonda Tucker | Rhonda Tucker | ✅ YES | ✅ YES |
 | 7099441752 | Shilo Hodder | Shilo Hodder | ✅ YES | ✅ YES |
-| 7802051972 | Kyle Godin | Kyle Godin | ✅ YES | ✅ YES |
+| 7802051972 | Elmo Oxford | Kyle Godin | ❌ NO | ❌ NO |
 | 7802075649 | Amber Babcock | Amber Babcock | ✅ YES | ✅ YES |
 | 7802107923 | Troy Goreski | Joshua Buckley | ❌ NO | ✅ YES |
 | 7802141300 | Donna Croucher | Donna Croucher | ✅ YES | ✅ YES |
@@ -211,9 +211,11 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 7808385292 | Winnie Roberts | Winnie Roberts | ✅ YES | ✅ YES |
 | 7808385770 | Dawn Collier | Dawn Collier | ✅ YES | ✅ YES |
 | 7808527943 | Barry Gilbert | Barry Gilbert | ✅ YES | ✅ YES |
-| 7808706995 | Roberta Russell | Roberta Russell | ✅ YES | ✅ YES |
-| 7808722637 | Natasha Dumont | Natasha Dumont | ✅ YES | ✅ YES |
+| 7808706995 | Reagan McKenzie | Roberta Russell | ❌ NO | ❌ NO |
+| 7808722637 | Patricia Leroy | Natasha Dumont | ❌ NO | ❌ NO |
 | 8676696400 | Michael Garcia | Sang Nguyen | ❌ NO | ❌ NO |
+| 8676786300 | Inuvik Cap Suites | Newton Grey | ❌ NO | ✅ YES |
+| 8679202909 | Account Name: | Mashal Sherbaz | ❌ NO | ✅ YES |
 | 8679792395 | Linay Freda | Linay Freda | ✅ YES | ✅ YES |
 | 8679793537 | Ted Walker | Ted Walker | ✅ YES | ✅ YES |
 | 8674440731 | Yellowknife On-Call | Yellowknife On-Call | ✅ YES | ✅ YES |
@@ -224,10 +226,10 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 8674457762 | Jason George | Jason George | ✅ YES | ✅ YES |
 | 8674458202 | Rolando DelaCruz | Rolando DelaCruz | ✅ YES | ✅ YES |
 | 8674460216 | Steve Kerr | Steve Kerr | ✅ YES | ✅ YES |
-| 8674460773 | Christopher De La paz | Christopher De La paz | ✅ YES | ✅ YES |
+| 8674460773 | Elmer Gacayan | Christopher De La paz | ❌ NO | ❌ NO |
 | 8674460775 | YK Security | Keven Schidlowsky | ❌ NO | ✅ YES |
 | 8674460876 | Newton Grey | Newton Grey | ✅ YES | ✅ YES |
-| 8674460982 | Russell Pambid | Russell Pambid | ✅ YES | ✅ YES |
+| 8674460982 | Rupert Manuba | Russell Pambid | ❌ NO | ❌ NO |
 | 8674461192 | Noriyuki Matsuo | Noriyuki Matsuo | ✅ YES | ✅ YES |
 | 8674462814 | Brian Maule | Brian Maule | ✅ YES | ✅ YES |
 | 8676867984 | Michael Williams | Michael Williams | ✅ YES | ✅ YES |
@@ -246,47 +248,95 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 9029435118 | Justin Bautista | Justin Bautista | ✅ YES | ✅ YES |
 
 **Cross-Reference Summary:**
-- Phone numbers with matching users: 154/165 (93.3%)
-- Phone numbers with consistent status: 164/165 (99.4%)
+- Phone numbers with matching users: 127/167 (76.0%)
+- Phone numbers with consistent status: 138/167 (82.6%)
 
-## 📱 Phone Number Reassignments (11 found)
+## 📱 Phone Number Reassignments (40 found)
 
 **🚨 CRITICAL ISSUE:** These phone numbers have different users in Service Overview vs Active Directory:
 
 | Phone Number | Service Overview User | Active Directory User | Service Status | AD Status |
 |--------------|----------------------|----------------------|----------------|----------|
+| 2048900255 | Darrell Everard | Ignacio Gonzalez | Expired | Enabled |
+| 2048900266 | Werner Franz | Bohdan Miniailo | Expired | Enabled |
+| 2048900302 | Roxana Echavarria-Besora | Roxana Besora | Expired | Enabled |
+| 2502633335 | Shannon Magee | Christal Ritchie | Expired | Enabled |
+| 2503013255 | Stefanie Halford | Janell Lovelace | Expired | Enabled |
+| 2503274819 | Bradley Westergard | Michael Townsend | Expired | Enabled |
 | 2507197496 | Sheryl Olson | Jessica Murray | Active | Enabled |
+| 2507197749 | Harold Greve | Dawson Martin-Fisher | Expired | Enabled |
+| 3062017203 | Marie Gamble | Danielle Loverick | Expired | Enabled |
+| 4038018445 | Tamara Stuart | Monika Garwol | Expired | Enabled |
 | 4313346105 | Luciano Echavarria | Tiago Chiesorin | Active | Enabled |
+| 5063783026 | Lucie Deveau | Glenn Ostulano | Expired | Enabled |
+| 5063784157 | Leonard Weston | Gilles Gaudet | Expired | Enabled |
 | 5063810448 | Rachelle Couture | Angela Fitzpatrick | Active | Enabled |
-| 5878301876 | Ali Mirza | Alicia Eaton | Active | Enabled |
-| 7096878394 | Joseph Noble | Jimson Millare | Active | Enabled |
-| 7097304884 | Katherine Graham | Menchene Mationg | Active | Enabled |
-| 7802107923 | Troy Goreski | Joshua Buckley | Active | Enabled |
-| 7802147037 | Adrian J. Reynolds | Dorothy Holloway | Active | Enabled |
-| 8676696400 | Michael Garcia | Sang Nguyen | Expired | Enabled |
-| 8674457382 | Joshua Kaiser - YK RM | James Iko | Active | Enabled |
-| 8674460775 | YK Security | Keven Schidlowsky | Active | Enabled |
+| 5063816622 | Connie Doucet | Jayda Ballantyne | Expired | Enabled |
+| 5063819452 | Phillip Greenlaw | Fadel Alhaddad | Expired | Enabled |
+| 5068520745 | Gerald Forest | Matthew Ellis | Expired | Enabled |
+| 5068750421 | Denis LeBlanc | Wanetta Cavanaugh | Expired | Enabled |
+| 5873703965 | Connie Dietrich | Rose Ricketts | Expired | Enabled |
+| 5874345991 | Craig Owens | Dacoda McCaffrey | Expired | Enabled |
+| ... | *(20 more reassignments)* | ... | ... | ... |
 
 **This is the core problem:** When John Doe leaves and Sarah McLachlan gets his phone number,
 the Service Overview still shows John Doe but AD shows Sarah McLachlan.
 
 ## 🚨 Critical Issues Requiring Immediate Attention
 
-### 🟡 Phone Assignment Issues (1 found)
+### 🟡 Phone Assignment Issues (29 found)
 
 These phone numbers are assigned to **EXPIRED users** in Service Overview, but the phones actually belong to **ACTIVE employees** in Active Directory:
 
 | Phone Number | Service Overview User | Active Directory User | Problem |
 |--------------|----------------------|----------------------|---------|
-| 8676696400 | Michael Garcia | Sang Nguyen | Service shows Expired but AD shows Enabled |
+| 2048900255 | Darrell Everard | Ignacio Gonzalez | Service shows Expired but AD shows Enabled |
+| 2048900266 | Werner Franz | Bohdan Miniailo | Service shows Expired but AD shows Enabled |
+| 2048900302 | Roxana Echavarria-Besora | Roxana Besora | Service shows Expired but AD shows Enabled |
+| 2502633335 | Shannon Magee | Christal Ritchie | Service shows Expired but AD shows Enabled |
+| 2503013255 | Stefanie Halford | Janell Lovelace | Service shows Expired but AD shows Enabled |
+| 2503274819 | Bradley Westergard | Michael Townsend | Service shows Expired but AD shows Enabled |
+| 2507197749 | Harold Greve | Dawson Martin-Fisher | Service shows Expired but AD shows Enabled |
+| 3062017203 | Marie Gamble | Danielle Loverick | Service shows Expired but AD shows Enabled |
+| 4038018445 | Tamara Stuart | Monika Garwol | Service shows Expired but AD shows Enabled |
+| 5063783026 | Lucie Deveau | Glenn Ostulano | Service shows Expired but AD shows Enabled |
+| 5063784157 | Leonard Weston | Gilles Gaudet | Service shows Expired but AD shows Enabled |
+| 5063816622 | Connie Doucet | Jayda Ballantyne | Service shows Expired but AD shows Enabled |
+| 5063819452 | Phillip Greenlaw | Fadel Alhaddad | Service shows Expired but AD shows Enabled |
+| 5068520745 | Gerald Forest | Matthew Ellis | Service shows Expired but AD shows Enabled |
+| 5068750421 | Denis LeBlanc | Wanetta Cavanaugh | Service shows Expired but AD shows Enabled |
+| 5873703965 | Connie Dietrich | Rose Ricketts | Service shows Expired but AD shows Enabled |
+| 5874345991 | Craig Owens | Dacoda McCaffrey | Service shows Expired but AD shows Enabled |
+| 5874359157 | Claire Livingstone | Anthony Parker | Service shows Expired but AD shows Enabled |
+| 7092800373 | Eric Dempsey | Natasha Reid | Service shows Expired but AD shows Enabled |
+| 7093276934 | Thanh Vo | Doreen Moyst | Service shows Expired but AD shows Enabled |
+| ... | *(9 more entries)* | ... | ... |
 
-### 🔴 Users Who Should Be EXPIRED (127 found)
+### 🔴 Users Who Should Be EXPIRED (300 found)
 
 **💰 FINANCIAL IMPACT:** These are users NOT in Active Directory but we're still paying for their phone services.
 
 | Phone Number | Service Overview User | Problem |
 |--------------|----------------------|---------|
+| 101004048 | Account Name: | Service shows Active but phone not in AD |
+| 200027433 | Account Name: | Service shows Active but phone not in AD |
+| 200028360 | Account Name: | Service shows Active but phone not in AD |
+| 200028365 | Account Name: | Service shows Active but phone not in AD |
 | 200034338 | Account Name: | Service shows Active but phone not in AD |
+| 200036445 | Account Name: | Service shows Active but phone not in AD |
+| 201001029 | Account Name: | Service shows Active but phone not in AD |
+| 201002035 | Account Name: | Service shows Active but phone not in AD |
+| 201002638 | Account Name: | Service shows Active but phone not in AD |
+| 201002640 | Account Name: | Service shows Active but phone not in AD |
+| 201002641 | Account Name: | Service shows Active but phone not in AD |
+| 201003367 | Account Name: | Service shows Active but phone not in AD |
+| 201004643 | Account Name: | Service shows Active but phone not in AD |
+| 201007234 | Account Name: | Service shows Active but phone not in AD |
+| 201010021 | Account Name: | Service shows Active but phone not in AD |
+| 201010972 | Account Name: | Service shows Active but phone not in AD |
+| 201011567 | Account Name: | Service shows Active but phone not in AD |
+| 201012838 | Account Name: | Service shows Active but phone not in AD |
+| 201014538 | Account Name: | Service shows Active but phone not in AD |
 | 2048900303 | NOT FOUND FOUND | Service shows Active but phone not in AD |
 | 2049305328 | SECURITY GUARD | Service shows Active but phone not in AD |
 | 2265833438 | JASON HARRISON | Service shows Active but phone not in AD |
@@ -298,6 +348,7 @@ These phone numbers are assigned to **EXPIRED users** in Service Overview, but t
 | 2508950419 | NOT FOUND | Service shows Active but phone not in AD |
 | 33310689000000 | Account Name: | Service shows Active but phone not in AD |
 | 33310496000000 | Account Name: | Service shows Active but phone not in AD |
+| 33305946000000 | Account Name: | Service shows Active but phone not in AD |
 | 3659944741 | LIVE MAINTENANCE BRANTFOR | Service shows Active but phone not in AD |
 | 4034635050 | Bhakti Makwana | Service shows Active but phone not in AD |
 | 4035406684 | Travis Byspalko | Service shows Active but phone not in AD |
@@ -329,12 +380,140 @@ These phone numbers are assigned to **EXPIRED users** in Service Overview, but t
 | 7096933411 | Brad Pelley | Service shows Active but phone not in AD |
 | 7096939312 | Ronald Ivany | Service shows Active but phone not in AD |
 | 7809018402 | Ann Campbell | Service shows Active but phone not in AD |
+| 8676690017 | Account Name: | Service shows Active but phone not in AD |
+| 8676690019 | Account Name: | Service shows Active but phone not in AD |
+| 8676690040 | Account Name: | Service shows Active but phone not in AD |
+| 8676690105 | Account Name: | Service shows Active but phone not in AD |
+| 8676690155 | Account Name: | Service shows Active but phone not in AD |
+| 8676690156 | Account Name: | Service shows Active but phone not in AD |
+| 8676690202 | Account Name: | Service shows Active but phone not in AD |
+| 8676690212 | Account Name: | Service shows Active but phone not in AD |
+| 8676690259 | Account Name: | Service shows Active but phone not in AD |
+| 8676690364 | Account Name: | Service shows Active but phone not in AD |
+| 8676690505 | Account Name: | Service shows Active but phone not in AD |
+| 8676690926 | Account Name: | Service shows Active but phone not in AD |
+| 8676693008 | Account Name: | Service shows Active but phone not in AD |
+| 8676693170 | Account Name: | Service shows Active but phone not in AD |
+| 8676693687 | Account Name: | Service shows Active but phone not in AD |
+| 8676694507 | Account Name: | Service shows Active but phone not in AD |
+| 8676695494 | Account Name: | Service shows Active but phone not in AD |
 | 8676696456 | Account Name: | Service shows Active but phone not in AD |
 | 8676696725 | Account Name: | Service shows Active but phone not in AD |
+| 8676696760 | Account Name: | Service shows Active but phone not in AD |
+| 8676696777 | Account Name: | Service shows Active but phone not in AD |
+| 8676697011 | Account Name: | Service shows Active but phone not in AD |
+| 8676697069 | Account Name: | Service shows Active but phone not in AD |
+| 8676697301 | Account Name: | Service shows Active but phone not in AD |
+| 8676697331 | Account Name: | Service shows Active but phone not in AD |
+| 8676697396 | Account Name: | Service shows Active but phone not in AD |
 | 8676697481 | Account Name: | Service shows Active but phone not in AD |
+| 8676697828 | Account Name: | Service shows Active but phone not in AD |
 | 8676698821 | Account Name: | Service shows Active but phone not in AD |
+| 8676699237 | Account Name: | Service shows Active but phone not in AD |
+| 8676699238 | Account Name: | Service shows Active but phone not in AD |
+| 8676699384 | Account Name: | Service shows Active but phone not in AD |
+| 8676699415 | Account Name: | Service shows Active but phone not in AD |
+| 8676699430 | Account Name: | Service shows Active but phone not in AD |
+| 8676699672 | Account Name: | Service shows Active but phone not in AD |
+| 8676699735 | Account Name: | Service shows Active but phone not in AD |
+| 8676782034 | Account Name: | Service shows Active but phone not in AD |
+| 8676782231 | Account Name: | Service shows Active but phone not in AD |
+| 8676782336 | Account Name: | Service shows Active but phone not in AD |
+| 8676782359 | Account Name: | Service shows Active but phone not in AD |
+| 8676782362 | Account Name: | Service shows Active but phone not in AD |
+| 8676782418 | Account Name: | Service shows Active but phone not in AD |
+| 8676782463 | Account Name: | Service shows Active but phone not in AD |
+| 8676782602 | Account Name: | Service shows Active but phone not in AD |
+| 8676782761 | Account Name: | Service shows Active but phone not in AD |
+| 8676786309 | Account Name: | Service shows Active but phone not in AD |
+| 8677662029 | Account Name: | Service shows Active but phone not in AD |
+| 8677662294 | Account Name: | Service shows Active but phone not in AD |
+| 8677662869 | Account Name: | Service shows Active but phone not in AD |
+| 8677664229 | Account Name: | Service shows Active but phone not in AD |
+| 8677664281 | Account Name: | Service shows Active but phone not in AD |
+| 8677666777 | Account Name: | Service shows Active but phone not in AD |
+| 8677772135 | Account Name: | Service shows Active but phone not in AD |
+| 8677772342 | Account Name: | Service shows Active but phone not in AD |
+| 8677772601 | Account Name: | Service shows Active but phone not in AD |
+| 8677772608 | Account Name: | Service shows Active but phone not in AD |
+| 8677772613 | Account Name: | Service shows Active but phone not in AD |
+| 8677772634 | Account Name: | Service shows Active but phone not in AD |
+| 8677772652 | Account Name: | Service shows Active but phone not in AD |
+| 8677772654 | Account Name: | Service shows Active but phone not in AD |
+| 8677772736 | Account Name: | Service shows Active but phone not in AD |
+| 8677772960 | Account Name: | Service shows Active but phone not in AD |
+| 8677773162 | Account Name: | Service shows Active but phone not in AD |
+| 8677773288 | Account Name: | Service shows Active but phone not in AD |
+| 8677773426 | Account Name: | Service shows Active but phone not in AD |
+| 8677773850 | Account Name: | Service shows Active but phone not in AD |
+| 8677773956 | Account Name: | Service shows Active but phone not in AD |
+| 8677774103 | Account Name: | Service shows Active but phone not in AD |
+| 8677774109 | Account Name: | Service shows Active but phone not in AD |
+| 8677774476 | Account Name: | Service shows Active but phone not in AD |
+| 8677774607 | Account Name: | Service shows Active but phone not in AD |
+| 8677774609 | Account Name: | Service shows Active but phone not in AD |
+| 8677774612 | Account Name: | Service shows Active but phone not in AD |
+| 8677774617 | Account Name: | Service shows Active but phone not in AD |
+| 8677774618 | Account Name: | Service shows Active but phone not in AD |
+| 8677774639 | Account Name: | Service shows Active but phone not in AD |
 | 8678732358 | Account Name: | Service shows Active but phone not in AD |
+| 8678732612 | Account Name: | Service shows Active but phone not in AD |
+| 8678732619 | Account Name: | Service shows Active but phone not in AD |
+| 8678732641 | Account Name: | Service shows Active but phone not in AD |
+| 8678733444 | Account Name: | Service shows Active but phone not in AD |
+| 8678734186 | Account Name: | Service shows Active but phone not in AD |
+| 8678734195 | Account Name: | Service shows Active but phone not in AD |
+| 8678734612 | Account Name: | Service shows Active but phone not in AD |
+| 8678734873 | Account Name: | Service shows Active but phone not in AD |
+| 8678734949 | Account Name: | Service shows Active but phone not in AD |
+| 8678734990 | Account Name: | Service shows Active but phone not in AD |
+| 8678735264 | Account Name: | Service shows Active but phone not in AD |
+| 8678735366 | Account Name: | Service shows Active but phone not in AD |
+| 8678735367 | Account Name: | Service shows Active but phone not in AD |
+| 8678735397 | Account Name: | Service shows Active but phone not in AD |
+| 8678735527 | Account Name: | Service shows Active but phone not in AD |
+| 8678735529 | Account Name: | Service shows Active but phone not in AD |
+| 8678735784 | Account Name: | Service shows Active but phone not in AD |
+| 8678735830 | Account Name: | Service shows Active but phone not in AD |
+| 8678735917 | Account Name: | Service shows Active but phone not in AD |
+| 8678736164 | Account Name: | Service shows Active but phone not in AD |
+| 8678736208 | Account Name: | Service shows Active but phone not in AD |
+| 8678736286 | Account Name: | Service shows Active but phone not in AD |
+| 8678736290 | Account Name: | Service shows Active but phone not in AD |
+| 8678736356 | Account Name: | Service shows Active but phone not in AD |
+| 8678736371 | Account Name: | Service shows Active but phone not in AD |
+| 8678738830 | Account Name: | Service shows Active but phone not in AD |
+| 8678739059 | Account Name: | Service shows Active but phone not in AD |
+| 8678739206 | Account Name: | Service shows Active but phone not in AD |
+| 8678739208 | Account Name: | Service shows Active but phone not in AD |
+| 8678739210 | Account Name: | Service shows Active but phone not in AD |
+| 8678739404 | Account Name: | Service shows Active but phone not in AD |
+| 8678739711 | Account Name: | Service shows Active but phone not in AD |
+| 8679200753 | Account Name: | Service shows Active but phone not in AD |
+| 8679200855 | Account Name: | Service shows Active but phone not in AD |
+| 8679202061 | Account Name: | Service shows Active but phone not in AD |
+| 8679202277 | Account Name: | Service shows Active but phone not in AD |
+| 8679202487 | Account Name: | Service shows Active but phone not in AD |
+| 8679202493 | Account Name: | Service shows Active but phone not in AD |
+| 8679202496 | Account Name: | Service shows Active but phone not in AD |
+| 8679202497 | Account Name: | Service shows Active but phone not in AD |
+| 8679202498 | Account Name: | Service shows Active but phone not in AD |
+| 8679202499 | Account Name: | Service shows Active but phone not in AD |
+| 8679202544 | Account Name: | Service shows Active but phone not in AD |
+| 8679204002 | Account Name: | Service shows Active but phone not in AD |
+| 8679204007 | Account Name: | Service shows Active but phone not in AD |
+| 8679204046 | Account Name: | Service shows Active but phone not in AD |
+| 8679204124 | Account Name: | Service shows Active but phone not in AD |
+| 8679204289 | Account Name: | Service shows Active but phone not in AD |
+| 8679204425 | Account Name: | Service shows Active but phone not in AD |
+| 8679204491 | Account Name: | Service shows Active but phone not in AD |
+| 8679204887 | Account Name: | Service shows Active but phone not in AD |
+| 8679207049 | Account Name: | Service shows Active but phone not in AD |
+| 8679207210 | Account Name: | Service shows Active but phone not in AD |
+| 8679207408 | Account Name: | Service shows Active but phone not in AD |
 | 8679207526 | Account Name: | Service shows Active but phone not in AD |
+| 8679207550 | Account Name: | Service shows Active but phone not in AD |
+| 8679207675 | Account Name: | Service shows Active but phone not in AD |
 | 8679752219 | Account Name: | Service shows Active but phone not in AD |
 | 8679752389 | Account Name: | Service shows Active but phone not in AD |
 | 8679752509 | Account Name: | Service shows Active but phone not in AD |
@@ -404,15 +583,41 @@ These phone numbers are assigned to **EXPIRED users** in Service Overview, but t
 | 8679798852 | Account Name: | Service shows Active but phone not in AD |
 | 8679798863 | Account Name: | Service shows Active but phone not in AD |
 | 8679798867 | Account Name: | Service shows Active but phone not in AD |
-| 8674453688 | NOT FOUND | Service shows Active but phone not in AD |
+| 8674453688 | Yellowknife Orbi LTE Modem | Service shows Active but phone not in AD |
 | 8674460301 | Sheldon Rideout | Service shows Active but phone not in AD |
 | 8674460772 | Ervis Minina | Service shows Active but phone not in AD |
+| 867678630010 | Account Name: | Service shows Active but phone not in AD |
+| 867678630011 | Account Name: | Service shows Active but phone not in AD |
+| 867678630012 | Account Name: | Service shows Active but phone not in AD |
+| 86767863002 | Account Name: | Service shows Active but phone not in AD |
+| 86767863003 | Account Name: | Service shows Active but phone not in AD |
+| 86767863004 | Account Name: | Service shows Active but phone not in AD |
+| 86767863005 | Account Name: | Service shows Active but phone not in AD |
+| 86767863006 | Account Name: | Service shows Active but phone not in AD |
+| 86767863007 | Account Name: | Service shows Active but phone not in AD |
+| 86767863008 | Account Name: | Service shows Active but phone not in AD |
+| 86767863009 | Account Name: | Service shows Active but phone not in AD |
+| 86792029092 | Account Name: | Service shows Active but phone not in AD |
+| 86792029093 | Account Name: | Service shows Active but phone not in AD |
+| 86792029094 | Account Name: | Service shows Active but phone not in AD |
+| 86792029095 | Account Name: | Service shows Active but phone not in AD |
+| 86792029096 | Account Name: | Service shows Active but phone not in AD |
 | 9028176569 | Kenneth Yurett | Service shows Active but phone not in AD |
 | 9028309030 | Melojane Tomale | Service shows Active but phone not in AD |
 | 260087863201 | C NORTHVIEW APARTMENTS, 66 ESSEX ST UNIT CMMON | Service shows Active but phone not in AD |
+| 260091206201 | N APARTMENT REIT, 380 GAUVIN CH UNIT COMON | Service shows Active but phone not in AD |
+| 265048232301 | N CANADIAN HIGH YIELD, 66 ST. CLARE AVE UNIT OFFI1 | Service shows Active but phone not in AD |
+| 265048232505 | N CANADIAN HIGH YIELD, 27 PASADENA CRES UNIT OFFI1 | Service shows Active but phone not in AD |
 | 726122575 | NORTHVIEW APARTMENT REIT, 100 DU MARCHE RUE UNIT CMMON, NORTHVIEW APARTMENT REIT, 100 DU MARCHE RUE UNIT CMMON | Service shows Active but phone not in AD |
+| 124557 | Account Name: | Service shows Active but phone not in AD |
 | 320428 | Account Name: | Service shows Active but phone not in AD |
 | 320900 | Account Name: | Service shows Active but phone not in AD |
+| 443909 | Account Name: | Service shows Active but phone not in AD |
+| 495203 | Account Name: | Service shows Active but phone not in AD |
+| 541660 | Account Name: | Service shows Active but phone not in AD |
+| 551425 | Account Name: | Service shows Active but phone not in AD |
+| 845129 | Account Name: | Service shows Active but phone not in AD |
+| 857162 | Account Name: | Service shows Active but phone not in AD |
 
 **🔍 What These Entries Represent:**
 - **Former Employees:** Left company but phone service still active
@@ -427,11 +632,11 @@ These phone numbers are assigned to **EXPIRED users** in Service Overview, but t
 
 ### Immediate Priority (High Impact)
 
-1. **Fix 1 incorrectly expired users**
+1. **Fix 29 incorrectly expired users**
    - These are active employees showing as expired in Service Overview
    - Run Active Directory processor or update database directly
 
-2. **Review 127 users marked as active**
+2. **Review 300 users marked as active**
    - Cross-reference with UserManagement.csv for verification
    - Check for phone number reassignments
    - Identify service accounts vs actual users
@@ -439,12 +644,12 @@ These phone numbers are assigned to **EXPIRED users** in Service Overview, but t
 ## 🚀 Strategic Recommendations
 
 ### 💰 Cost Optimization (High Priority)
-1. **Audit Expired Services** - Review 127 services marked as active but not in AD
+1. **Audit Expired Services** - Review 300 services marked as active but not in AD
    - Potential monthly savings by cancelling unused services
    - Identify service accounts vs former employees
    - Implement automated service termination for departed staff
 
-2. **Phone Number Management** - Address 11 user mismatches
+2. **Phone Number Management** - Address 40 user mismatches
    - Update Service Overview when phones are reassigned
    - Implement phone reassignment tracking process
    - Ensure billing accuracy for current users
