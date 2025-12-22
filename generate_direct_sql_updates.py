@@ -15,7 +15,8 @@ No more fighting with OLE DB CSV parsing - just direct SQL fixes!
 
 import pandas as pd
 import os
-from datetime import datetime, timedelta
+import argparse
+from datetime import datetime
 
 def escape_sql_string(value):
     """Escape single quotes in SQL strings to prevent syntax errors"""
@@ -64,23 +65,33 @@ def get_customer_id():
         else:
             print("❌ Please enter exactly 3 digits (e.g., 096, 057, 123)")
 
-def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None):
+def _get_billing_months(include_prior: bool):
+    """Return list of YYYYMM strings for billing month (prev month) and optional prior month."""
+    now = datetime.now()
+    # billing month = previous month
+    if now.month == 1:
+        billing_dt = datetime(now.year - 1, 12, 1)
+    else:
+        billing_dt = datetime(now.year, now.month - 1, 1)
+
+    months = [billing_dt.strftime('%Y%m')]
+
+    if include_prior:
+        if billing_dt.month == 1:
+            prior_dt = datetime(billing_dt.year - 1, 12, 1)
+        else:
+            prior_dt = datetime(billing_dt.year, billing_dt.month - 1, 1)
+        months.append(prior_dt.strftime('%Y%m'))
+
+    return months
+
+def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None, include_prior=False):
     """Generate SQL UPDATE statements from AD CSV data"""
 
-    # Calculate previous month (since bills are always one month behind)
-    now = datetime.now()
-    # Go back one month
-    if now.month == 1:
-        prev_month_date = datetime(now.year - 1, 12, 1)
-    else:
-        prev_month_date = datetime(now.year, now.month - 1, 1)
-
-    # Format as YYYYMM (e.g., 202511 for November 2025)
-    current_billing_month = prev_month_date.strftime('%Y%m')
-    print(f"  📅 Using billing month: {current_billing_month} (current month - 1)")
-
-    # Only update records from this month forward
-    date_filter = f"'{current_billing_month}'"
+    # Determine target billing months (current prev month, optionally prior month too)
+    target_months = _get_billing_months(include_prior)
+    months_sql_list = ", ".join([f"'{m}'" for m in target_months])
+    print(f"  📅 Target billing month(s): {', '.join(target_months)}")
 
     print("🔧 GENERATING DIRECT SQL UPDATES...")
 
@@ -93,6 +104,7 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None):
         df = pd.read_csv(ad_csv_path)
         print(f"  📂 Loaded {len(df)} AD records from: {os.path.basename(ad_csv_path)}")
         print(f"  🎯 Target tables: C_{customer_id}_People, C_{customer_id}_Assets, C_{customer_id}_ServiceDetails")
+        print(f"  🎯 ServiceDetails scope: DateRef IN ({months_sql_list})")
     except Exception as e:
         print(f"❌ Error loading AD CSV: {e}")
         return False
@@ -266,7 +278,7 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None):
     sql_statements.append("    ON sd.AssetID = a.AssetID")
     sql_statements.append("    AND (sd.VendorID = a.VendorID OR a.VendorID IS NULL OR sd.VendorID IS NULL)")
     sql_statements.append(f"LEFT JOIN C_{customer_id}_People p ON a.CorpRef = p.id")
-    sql_statements.append(f"WHERE sd.DateRef >= {date_filter};")  # Previous month (billing is always 1 month behind)
+    sql_statements.append(f"WHERE sd.DateRef IN ({months_sql_list});")
     sql_statements.append("")
 
     sql_statements.append("-- Step 2: Direct phone-based ServiceDetails updates")
@@ -287,7 +299,7 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None):
     sql_statements.append("    sd.Username = p_all.username")
     sql_statements.append(f"FROM C_{customer_id}_ServiceDetails sd")
     sql_statements.append("INNER JOIN p_all ON REPLACE(REPLACE(REPLACE(sd.AssetID,'-',''),'(',''),')','') = p_all.phone_clean")
-    sql_statements.append(f"WHERE sd.DateRef >= {date_filter}")
+    sql_statements.append(f"WHERE sd.DateRef IN ({months_sql_list})")
     sql_statements.append("  AND COALESCE(sd.UserRef, 0) = 0;")
     sql_statements.append("")
 
@@ -312,7 +324,7 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None):
     sql_statements.append("UNION ALL")
     sql_statements.append("SELECT 'ServiceDetails Linked' AS table_name,")
     sql_statements.append("       CASE WHEN UserRef IS NOT NULL AND UserRef > 0 THEN 'Linked' ELSE 'Unlinked' END,")
-    sql_statements.append(f"       COUNT(*) FROM C_{customer_id}_ServiceDetails WHERE DateRef >= {date_filter}")
+    sql_statements.append(f"       COUNT(*) FROM C_{customer_id}_ServiceDetails WHERE DateRef IN ({months_sql_list})")
     sql_statements.append("GROUP BY CASE WHEN UserRef IS NOT NULL AND UserRef > 0 THEN 'Linked' ELSE 'Unlinked' END")
     sql_statements.append("ORDER BY table_name, status;")
     sql_statements.append("")
@@ -320,7 +332,7 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None):
     sql_statements.append(f"SELECT COUNT(*) as users_with_phone1 FROM C_{customer_id}_People WHERE phone1 IS NOT NULL AND phone1 <> '';")
     sql_statements.append(f"SELECT COUNT(*) as users_with_phone2 FROM C_{customer_id}_People WHERE phone2 IS NOT NULL AND phone2 <> '';")
     sql_statements.append(f"SELECT COUNT(*) as phone_matched_services FROM C_{customer_id}_ServiceDetails sd")
-    sql_statements.append(f"WHERE sd.UserRef_Type IN ('AD: Phone', 'AD: Name') AND sd.DateRef >= {date_filter};")
+    sql_statements.append(f"WHERE sd.UserRef_Type IN ('AD: Phone', 'AD: Name') AND sd.DateRef IN ({months_sql_list});")
 
     # Write SQL file
     try:
@@ -368,6 +380,13 @@ def select_client_for_sql():
         print("Run the sanitize AD router first to create sanitized CSV files.")
         return None, None
 
+    # Auto-select when only one client is available to avoid interactive EOF issues
+    if len(available_clients) == 1:
+        selected = available_clients[0]
+        print(f"\n✅ Selected: {selected['name'].upper()} (auto-selected)")
+        print(f"📁 Using sanitized AD file: {os.path.basename(selected['ad_file'])}")
+        return selected['ad_file'], selected['name']
+
     print("\n📋 AVAILABLE CLIENTS FOR SQL GENERATION:")
     print("=" * 60)
 
@@ -395,8 +414,30 @@ def select_client_for_sql():
 def main():
     """Main execution function"""
 
-    # Let user select which client to generate SQL for
-    input_file, client = select_client_for_sql()
+    parser = argparse.ArgumentParser(description="Generate direct SQL updates from sanitized AD data")
+    parser.add_argument("--customer-id", dest="customer_id", type=str, help="Customer ID in 0000000XXX format")
+    parser.add_argument("--client", dest="client", type=str, help="Client name to use (e.g., Northview)")
+    parser.add_argument("--include-prior", dest="include_prior", action="store_true", help="Include prior month in ServiceDetails updates")
+    args = parser.parse_args()
+
+    # Determine client and input file
+    input_file = None
+    client = None
+
+    if args.client:
+        # Try to resolve client directly
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        ad_path = find_latest_file(os.path.join(script_dir, "ActiveDirectory_input", args.client), "*_SANITIZED.csv")
+        if ad_path:
+            input_file = ad_path
+            client = args.client
+            print(f"\n✅ Selected (via arg): {client.upper()}")
+            print(f"📁 Using sanitized AD file: {os.path.basename(input_file)}")
+        else:
+            print(f"❌ No sanitized AD data found for client '{args.client}'")
+            input_file, client = select_client_for_sql()
+    else:
+        input_file, client = select_client_for_sql()
 
     if not input_file:
         return
@@ -409,7 +450,7 @@ def main():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_file = os.path.join(output_dir, f"AD_Direct_Updates_{timestamp}.sql")
 
-    result = generate_sql_updates(input_file, output_file)
+    result = generate_sql_updates(input_file, output_file, customer_id=args.customer_id, include_prior=args.include_prior)
 
     if result:
         print("\n✅ SQL GENERATION COMPLETE!")

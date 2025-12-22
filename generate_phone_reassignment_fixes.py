@@ -29,21 +29,40 @@ def get_customer_id():
             print("❌ Please enter exactly 3 digits (e.g., 096, 057, 123)")
 
 def find_latest_phone_reassignment_file():
-    """Find the most recent phone reassignments CSV file"""
+    """Find the most recent phone reassignments CSV file across root and client subfolders."""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     output_dir = os.path.join(script_dir, "output")
 
     if not os.path.exists(output_dir):
         return None
 
-    # Find latest phone reassignments file
-    phone_files = [f for f in os.listdir(output_dir) if f.startswith('phone_reassignments_') and f.endswith('.csv')]
+    candidates = []
 
-    if not phone_files:
+    # Search root output directory
+    try:
+        for f in os.listdir(output_dir):
+            path = os.path.join(output_dir, f)
+            if os.path.isfile(path) and f.startswith('phone_reassignments_') and f.endswith('.csv'):
+                candidates.append(path)
+    except Exception:
+        pass
+
+    # Search client subdirectories under output/
+    try:
+        for item in os.listdir(output_dir):
+            client_dir = os.path.join(output_dir, item)
+            if os.path.isdir(client_dir) and not item.startswith('.'):
+                for f in os.listdir(client_dir):
+                    path = os.path.join(client_dir, f)
+                    if os.path.isfile(path) and f.startswith('phone_reassignments_') and f.endswith('.csv'):
+                        candidates.append(path)
+    except Exception:
+        pass
+
+    if not candidates:
         return None
 
-    latest_file = max(phone_files, key=lambda x: os.path.getmtime(os.path.join(output_dir, x)))
-    return os.path.join(output_dir, latest_file)
+    return max(candidates, key=os.path.getmtime)
 
 def generate_phone_reassignment_fix_sql(customer_id=None):
     """Generate SQL to fix phone reassignments"""
@@ -109,25 +128,15 @@ def generate_phone_reassignment_fix_sql(customer_id=None):
         # Clean phone number (remove any formatting)
         phone_clean = ''.join(filter(str.isdigit, phone_number))
 
-        sql_statements.append(f"-- Fix phone {phone_number}: {old_user} → {new_user}")
-
-        # Update ServiceDetails to use the current AD user (ONLY current months)
-        sql_statements.append(f"UPDATE C_{customer_id}_ServiceDetails")
-        sql_statements.append(f"SET Username = '{new_user}',")
-        sql_statements.append(f"    UserRef_Type = 'Phone Reassign'")
-        sql_statements.append(f"WHERE AssetID = '{phone_clean}'")
-        sql_statements.append(f"  AND Username = '{old_user}'")
-        sql_statements.append(f"  AND DateRef IN ('202512', '202511');  -- Only current months")
-        sql_statements.append("")
-
-        # Handle any formatting variations (ONLY current months)
-        sql_statements.append(f"-- Also handle formatting variations for {phone_number}")
-        sql_statements.append(f"UPDATE C_{customer_id}_ServiceDetails")
-        sql_statements.append(f"SET Username = '{new_user}',")
-        sql_statements.append(f"    UserRef_Type = 'Phone Reassign'")
-        sql_statements.append(f"WHERE AssetID IN ('{phone_number}', '{phone_clean}')")
-        sql_statements.append(f"  AND Username = '{old_user}'")
-        sql_statements.append(f"  AND DateRef IN ('202512', '202511');  -- Only current months")
+        sql_statements.append(f"-- Reassign phone {phone_number}: {old_user} → {new_user}")
+        sql_statements.append(f"UPDATE sd")
+        sql_statements.append(f"SET sd.UserRef = p.id,")
+        sql_statements.append(f"    sd.UserRef_Type = 'AD Fix',")
+        sql_statements.append(f"    sd.Username = LEFT(p.username, 20)")
+        sql_statements.append(f"FROM C_{customer_id}_ServiceDetails sd")
+        sql_statements.append(f"INNER JOIN C_{customer_id}_People p ON p.username = '{new_user}'")
+        sql_statements.append(f"WHERE sd.AssetID = '{phone_clean}'")
+        sql_statements.append(f"  AND sd.DateRef IN ('202512', '202511');")
         sql_statements.append("")
 
         fix_count += 1
@@ -162,13 +171,13 @@ def generate_phone_reassignment_fix_sql(customer_id=None):
     sql_statements.append("-- Count total updates made")
     sql_statements.append(f"SELECT COUNT(*) as total_reassignments")
     sql_statements.append(f"FROM C_{customer_id}_ServiceDetails")
-    sql_statements.append(f"WHERE UserRef_Type = 'Phone Reassign'")
+    sql_statements.append("WHERE UserRef_Type = 'AD Fix'")
     sql_statements.append(f"  AND DateRef IN ('202512', '202511');")
     sql_statements.append("")
     sql_statements.append("-- Show sample of reassigned phones")
     sql_statements.append(f"SELECT TOP 10 AssetID, Username, UserRef_Type, DateRef")
     sql_statements.append(f"FROM C_{customer_id}_ServiceDetails")
-    sql_statements.append(f"WHERE UserRef_Type = 'Phone Reassign'")
+    sql_statements.append(f"WHERE UserRef_Type = 'AD Fix'")
     sql_statements.append(f"  AND DateRef IN ('202512', '202511')")
     sql_statements.append(f"ORDER BY AssetID;")
     sql_statements.append("")
@@ -176,7 +185,7 @@ def generate_phone_reassignment_fix_sql(customer_id=None):
     sql_statements.append("-- SAFETY CONTROLS")
     sql_statements.append("-- ===============================================================================")
     sql_statements.append("")
-    sql_statements.append(f"PRINT 'Phone reassignment completed - {fix_count} fixes applied';")
+    sql_statements.append(f"PRINT 'Phone reassignment completed - {fix_count} fixes applied (UserRef_Type=AD Fix)';")
     sql_statements.append("PRINT 'Review results above before committing';")
     sql_statements.append("")
     sql_statements.append("-- COMMIT;")

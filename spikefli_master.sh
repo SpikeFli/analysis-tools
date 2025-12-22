@@ -89,7 +89,17 @@ sanitize_ad() {
 generate_sql() {
     print_info "Starting SQL generation..."
     get_customer_id
-    echo "$customer_digits" | python3 generate_direct_sql_updates.py
+    # Ask whether to include prior month as well
+    echo -n "Include prior month as well? (y/N): "
+    read include_prior_choice
+    if [[ "$include_prior_choice" =~ ^[Yy]$ ]]; then
+        INCLUDE_PRIOR_FLAG="--include-prior"
+    else
+        INCLUDE_PRIOR_FLAG=""
+    fi
+
+    # Pass customer ID to Python to avoid stdin piping issues
+    python3 generate_direct_sql_updates.py --customer-id "$CUSTOMER_ID" $INCLUDE_PRIOR_FLAG
     if [ $? -eq 0 ]; then
         print_status "SQL generation completed successfully"
         return 0
