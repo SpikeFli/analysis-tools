@@ -5,6 +5,7 @@ SpikeFli Client-Specific AD Sanitizer Router
 Routes to the appropriate Active Directory sanitizer based on client:
 - Northview: sanitize_ad_csv.py
 - Synovus/Cenovus: sanitize_synovus_ad.py
+- Gibson: sanitize_ad_csv.py (Northview-compatible)
 
 Now supports organized folder structure:
 ActiveDirectory_input/
@@ -29,6 +30,8 @@ def detect_client_from_filename(filename):
         return 'synovus'
     elif any(pattern in name for pattern in ['northview']):
         return 'northview'
+    elif any(pattern in name for pattern in ['gibson']):
+        return 'gibson'
 
     return 'unknown'
 
@@ -63,7 +66,7 @@ def find_ad_files():
         return []
 
     files = []
-    client_folders = ['Northview', 'Synovus', 'Gateway', 'Other']
+    client_folders = ['Northview', 'Synovus', 'Gateway', 'Gateway Mechanical', 'Gibson', 'Gibson Energy', 'Other']
 
     # Check client-specific folders first
     for client_folder in client_folders:
@@ -130,7 +133,10 @@ def main():
         client_from_content = detect_client_from_content(selected_file)
 
         # Determine final client
-        if client_from_content != 'unknown':
+        if client_from_name == 'gibson':
+            detected_client = client_from_name
+            print(f"🎯 Detected from filename: {detected_client.upper()}")
+        elif client_from_content != 'unknown':
             detected_client = client_from_content
             print(f"🎯 Detected from content: {detected_client.upper()}")
         elif client_from_name != 'unknown':
@@ -140,9 +146,15 @@ def main():
             print("⚠️  Could not auto-detect client type")
             print("   1. Northview")
             print("   2. Synovus/Cenovus")
+            print("   3. Gibson")
             try:
-                choice = int(input("Manual selection (1-2): "))
-                detected_client = 'northview' if choice == 1 else 'synovus'
+                choice = int(input("Manual selection (1-3): "))
+                if choice == 1:
+                    detected_client = 'northview'
+                elif choice == 2:
+                    detected_client = 'synovus'
+                else:
+                    detected_client = 'gibson'
             except ValueError:
                 print("❌ Invalid selection")
                 return
@@ -161,7 +173,7 @@ def main():
             print(f"❌ Could not import Synovus sanitizer: {e}")
             print("   Make sure sanitize_synovus_ad.py exists")
             return
-    else:  # northview or fallback
+    else:  # northview, gibson, or fallback
         # Import and run Northview sanitizer
         try:
             from sanitize_ad_csv import process_ad_file

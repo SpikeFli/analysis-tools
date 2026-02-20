@@ -112,6 +112,12 @@ def standardize_synovus_format(df):
     standardized['Manager'] = df.get('managerdn', pd.Series([''] * len(df))).fillna('')
     standardized['BillingCode'] = df['Cost Center'].fillna('')
 
+    # Additional org fields (optional, pass-through)
+    standardized['Group'] = df.get('Group', pd.Series([''] * len(df))).fillna('')
+    standardized['GL1'] = df.get('Cost Center - GL1', df.get('Cost Center', pd.Series([''] * len(df)))).fillna('')
+    standardized['GL2'] = df.get('Cost Center 2 - GL2', pd.Series([''] * len(df))).fillna('')
+    standardized['Location'] = df.get('Location', pd.Series([''] * len(df))).fillna('')
+
     # Status field - convert from "3::Active" to 1/0
     standardized['Enabled'] = df['personstatus'].apply(convert_person_status)
 

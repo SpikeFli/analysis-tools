@@ -862,38 +862,91 @@ def find_latest_file(directory, pattern):
         return None
     return max(files, key=os.path.getmtime)
 
+
+def find_latest_file_recursive(directory, pattern):
+    """Find the most recently modified file matching a pattern, recursively"""
+    import glob
+    if not directory or not os.path.exists(directory):
+        return None
+    files = glob.glob(os.path.join(directory, '**', pattern), recursive=True)
+    if not files:
+        return None
+    return max(files, key=os.path.getmtime)
+
 def scan_available_clients():
     """Scan for available clients and their data status"""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     inputs_dir = os.path.join(script_dir, "inputs")
     ad_dir = os.path.join(script_dir, "ActiveDirectory_input")
 
-    clients = ['Northview', 'Synovus', 'Gateway', 'Other']
+    client_names = set()
+    if os.path.exists(ad_dir):
+        for name in os.listdir(ad_dir):
+            if os.path.isdir(os.path.join(ad_dir, name)):
+                client_names.add(name)
+    if os.path.exists(inputs_dir):
+        for name in os.listdir(inputs_dir):
+            if os.path.isdir(os.path.join(inputs_dir, name)):
+                client_names.add(name)
+
+    if not client_names:
+        client_names = {'Northview', 'Synovus', 'Gateway', 'Other'}
+
     available_clients = []
 
-    for client in clients:
+    for client in sorted(client_names):
         client_data = {'name': client, 'ad_file': None, 'service_file': None, 'user_mgmt_file': None, 'people_file': None}
 
         # Check for AD files
         ad_client_dir = os.path.join(ad_dir, client)
         if os.path.exists(ad_client_dir):
-            ad_path = find_latest_file(ad_client_dir, "*_SANITIZED.csv")
+            ad_path = find_latest_file_recursive(ad_client_dir, "*_SANITIZED.csv")
             if not ad_path:
-                ad_path = find_latest_file(ad_client_dir, "*.csv")
+                ad_path = find_latest_file_recursive(ad_client_dir, "*.csv")
             client_data['ad_file'] = ad_path
 
         # Check for input files
         client_input_dir = os.path.join(inputs_dir, client)
         if os.path.exists(client_input_dir):
-            service_path = find_latest_file(os.path.join(client_input_dir, "service_overview"), "*.csv")
-            user_mgmt_path = find_latest_file(os.path.join(client_input_dir, "user_management"), "*.csv")
-            people_path = find_latest_file(os.path.join(client_input_dir, "people_database"), "*.csv")
+            service_dir = os.path.join(client_input_dir, "service_overview")
+            user_mgmt_dir = os.path.join(client_input_dir, "user_management")
+            people_dir = os.path.join(client_input_dir, "people_database")
+
+            service_path = find_latest_file_recursive(service_dir, "*.csv")
+            if not service_path:
+                service_path = find_latest_file_recursive(client_input_dir, "*Service*Overview*.csv")
+
+            user_mgmt_path = find_latest_file_recursive(user_mgmt_dir, "*.csv")
+            if not user_mgmt_path:
+                user_mgmt_path = find_latest_file_recursive(client_input_dir, "*UserManagement*.csv")
+                if not user_mgmt_path:
+                    user_mgmt_path = find_latest_file_recursive(client_input_dir, "*UserList*.csv")
+
+            people_path = find_latest_file_recursive(people_dir, "*.csv")
+            if not people_path:
+                people_path = find_latest_file_recursive(client_input_dir, "*People*.csv")
+
             client_data['service_file'] = service_path
             client_data['user_mgmt_file'] = user_mgmt_path
             client_data['people_file'] = people_path
+
         # Only include clients with at least AD data
         if client_data['ad_file']:
             available_clients.append(client_data)
+
+    # Also include root-level AD files if present
+    if os.path.exists(ad_dir):
+        root_ad_path = find_latest_file_recursive(ad_dir, "*_SANITIZED.csv")
+        if not root_ad_path:
+            root_ad_path = find_latest_file_recursive(ad_dir, "*.csv")
+        if root_ad_path:
+            available_clients.append({
+                'name': 'ActiveDirectory_input',
+                'ad_file': root_ad_path,
+                'service_file': None,
+                'user_mgmt_file': None,
+                'people_file': None,
+            })
 
     return available_clients
 

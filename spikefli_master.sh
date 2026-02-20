@@ -62,9 +62,10 @@ show_menu() {
     echo "7. 📝 Generate expired service fixes (mark services not in AD as expired)"
     echo "8. 📞 Generate phone reassignment fixes (fix mismatched users)"
     echo "9. � Generate phone assignment fixes (create new users + reassign phones)"
-    echo "10. 📄 Generate backup scripts"
-    echo "11. 🧹 Sanitize reviewed CSV (EXPIRED/GENERAL USE)"
-    echo "12. ❌ Exit"
+    echo "10. 🧾 Extended Details Update (People: GL1/GL2/Manager/UserAdress)"
+    echo "11. 📄 Generate backup scripts"
+    echo "12. 🧹 Sanitize reviewed CSV (EXPIRED/GENERAL USE)"
+    echo "13. ❌ Exit"
     echo ""
 }
 
@@ -173,11 +174,57 @@ generate_backups() {
     fi
 }
 
+# Function to select client with sanitized AD file
+select_client_with_sanitized() {
+    local clients=()
+    for d in ActiveDirectory_input/*/; do
+        if [[ -d "$d" ]] && ls "${d}"*_SANITIZED.csv >/dev/null 2>&1; then
+            clients+=("$(basename "$d")")
+        fi
+    done
+
+    if [[ ${#clients[@]} -eq 0 ]]; then
+        print_error "No client folders with *_SANITIZED.csv found in ActiveDirectory_input/"
+        return 1
+    fi
+
+    echo ""
+    echo "📁 AVAILABLE CLIENTS:"
+    echo "===================="
+    local i=1
+    for c in "${clients[@]}"; do
+        echo "${i}. ${c}"
+        i=$((i+1))
+    done
+    echo ""
+
+    while true; do
+        echo -n "👆 Select client [1-${#clients[@]}]: "
+        read choice
+        if [[ "$choice" =~ ^[0-9]+$ ]] && (( choice >= 1 && choice <= ${#clients[@]} )); then
+            CLIENT_NAME="${clients[$((choice-1))]}"
+            print_status "Using client: $CLIENT_NAME"
+            return 0
+        fi
+        print_error "Please enter a number between 1 and ${#clients[@]}"
+    done
+}
+
+# Function to generate extended details updates
+generate_extended_details_updates() {
+    print_info "Generating extended details update SQL..."
+    if ! select_client_with_sanitized; then
+        return 1
+    fi
+    get_customer_id
+    python3 generate_extended_details_updates.py --client-name "$CLIENT_NAME" --customer-id "$CUSTOMER_ID"
+}
+
 # Main execution loop
 main() {
     while true; do
         show_menu
-        echo -n "Enter your choice [1-12]: "
+        echo -n "Enter your choice [1-13]: "
         read choice
 
         case $choice in
@@ -252,18 +299,21 @@ main() {
                 python3 generate_phone_assignment_fixes.py
                 ;;
             10)
-                generate_backups
+                generate_extended_details_updates
                 ;;
             11)
+                generate_backups
+                ;;
+            12)
                 print_info "Sanitizing reviewed CSV (EXPIRED/GENERAL USE)..."
                 python3 sanitize_reviewed_csv.py
                 ;;
-            12)
+            13)
                 print_info "Goodbye!"
                 exit 0
                 ;;
             *)
-                print_error "Invalid choice. Please enter 1-12."
+                print_error "Invalid choice. Please enter 1-13."
                 ;;
         esac
 

@@ -136,6 +136,10 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None, in
         phone1 = clean_phone_number(row.get('telephoneNumber', ''))
         phone2 = clean_phone_number(row.get('mobile', ''))
         email = str(row.get('UserPrincipalName', '')).strip()
+        group = str(row.get('Group', '')).strip()
+        gl1 = str(row.get('GL1', '')).strip()
+        gl2 = str(row.get('GL2', '')).strip()
+        location = str(row.get('Location', '')).strip()
 
         # Get organizational fields if available (convert to 1/0 format)
         is_manager = convert_boolean_field(row.get('IsManager', ''))
@@ -151,6 +155,10 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None, in
         phone1_escaped = escape_sql_string(phone1)
         phone2_escaped = escape_sql_string(phone2)
         mgmt_level_escaped = escape_sql_string(mgmt_level)
+        group_escaped = escape_sql_string(group)
+        gl1_escaped = escape_sql_string(gl1)
+        gl2_escaped = escape_sql_string(gl2)
+        location_escaped = escape_sql_string(location)
 
         # Determine status - default to Active since the legacy parser is broken
         status = "Active"
@@ -177,6 +185,14 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None, in
         set_parts.append(f"isExec = {is_executive}")
         if mgmt_level and mgmt_level != 'nan' and mgmt_level != '':
             set_parts.append(f"mgrlevel = '{mgmt_level_escaped}'")
+        if group and group != 'nan':
+            set_parts.append(f"[Group] = '{group_escaped}'")
+        if gl1 and gl1 != 'nan':
+            set_parts.append(f"GL1 = '{gl1_escaped}'")
+        if gl2 and gl2 != 'nan':
+            set_parts.append(f"GL2 = '{gl2_escaped}'")
+        if location and location != 'nan':
+            set_parts.append(f"Location = '{location_escaped}'")
 
         # Join all SET parts
         sql_statements.append("SET " + ",\n    ".join(set_parts))
@@ -204,6 +220,10 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None, in
         phone2 = clean_phone_number(row.get('mobile', ''))
         email = str(row.get('UserPrincipalName', '')).strip()
         department = str(row.get('Department', '')).strip()
+        group = str(row.get('Group', '')).strip()
+        gl1 = str(row.get('GL1', '')).strip()
+        gl2 = str(row.get('GL2', '')).strip()
+        location = str(row.get('Location', '')).strip()
 
         if not cn or cn == 'nan':
             continue
@@ -215,6 +235,10 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None, in
         phone2_escaped = escape_sql_string(phone2)
         email_escaped = escape_sql_string(email)
         department_escaped = escape_sql_string(department)
+        group_escaped = escape_sql_string(group)
+        gl1_escaped = escape_sql_string(gl1)
+        gl2_escaped = escape_sql_string(gl2)
+        location_escaped = escape_sql_string(location)
 
         status = "Active" if enabled != "0" else "Expired"
 
@@ -223,7 +247,7 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None, in
         sql_statements.append("BEGIN")
         sql_statements.append(f"    INSERT INTO C_{customer_id}_People (")
         sql_statements.append(f"        status, isPerson, userid, username, email, phone1, phone2,")
-        sql_statements.append(f"        OU, LinkType, Modified")
+        sql_statements.append(f"        OU, [Group], GL1, GL2, Location, LinkType, Modified")
         sql_statements.append(f"    ) VALUES (")
         sql_statements.append(f"        '{status}', 1, '{cn_escaped}', '{display_name_escaped}',")
 
@@ -234,7 +258,7 @@ def generate_sql_updates(ad_csv_path, output_sql_path=None, customer_id=None, in
             sql_statements.append(f"        '',")
 
         sql_statements.append(f"        '{phone1_escaped}', '{phone2_escaped}',")
-        sql_statements.append(f"        '{department_escaped}', 'AD', GETDATE()")
+        sql_statements.append(f"        '{department_escaped}', '{group_escaped}', '{gl1_escaped}', '{gl2_escaped}', '{location_escaped}', 'AD', GETDATE()")
         sql_statements.append(f"    );")
         sql_statements.append("END;")
         sql_statements.append("")

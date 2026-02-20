@@ -12,8 +12,21 @@ This handles the "should_be_active" cases that require creating new People recor
 
 import os
 import glob
+import sys
 import pandas as pd
 from datetime import datetime
+
+if hasattr(sys.stdout, "reconfigure"):
+    # Avoid UnicodeEncodeError on Windows consoles using legacy encodings.
+    sys.stdout.reconfigure(errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(errors="replace")
+
+def _prev_month_start(dt):
+    """Return the first day of the previous calendar month."""
+    if dt.month == 1:
+        return datetime(dt.year - 1, 12, 1)
+    return datetime(dt.year, dt.month - 1, 1)
 
 def escape_sql_string(value):
     """Escape single quotes in SQL strings"""
@@ -24,7 +37,7 @@ def escape_sql_string(value):
 def get_customer_id():
     """Prompt user for the customer ID digits"""
     while True:
-        customer_digits = input("🔢 Enter the last 3 digits of the customer ID (e.g., 096): ").strip()
+        customer_digits = input("Enter the last 3 digits of the customer ID (e.g., 096): ").strip()
 
         if len(customer_digits) == 3 and customer_digits.isdigit():
             customer_id = f"0000000{customer_digits}"
@@ -159,14 +172,14 @@ def generate_phone_assignment_fix_sql(client_name=None):
     sql_statements.append("PRINT 'Starting phone assignment fixes...'")
     sql_statements.append("PRINT 'This script handles both new users (INSERT) and existing users (phone reassignment only)'")
 
-    # Get current billing month
+    # Billing month: previous calendar month (plus the month before that).
     now = datetime.now()
-    if now.month == 1:
-        prev_month_date = datetime(now.year - 1, 12, 1)
-    else:
-        prev_month_date = datetime(now.year, now.month - 1, 1)
-
+    prev_month_date = _prev_month_start(now)
     current_billing_month = prev_month_date.strftime('%Y%m')
+    prior_billing_month = _prev_month_start(prev_month_date).strftime('%Y%m')
+
+    dateref_months = [current_billing_month, prior_billing_month]
+    dateref_filter_sql = f"IN ('{current_billing_month}', '{prior_billing_month}')"
 
 # Generate conditional INSERT statements for new People records
     sql_statements.append("-- ================================================================================")
@@ -194,6 +207,10 @@ def generate_phone_assignment_fix_sql(client_name=None):
         phone1 = str(ad_data.get('telephoneNumber', '')).strip()
         phone2 = str(ad_data.get('mobile', '')).strip()
         department = escape_sql_string(str(ad_data.get('Department', '')))
+        group = escape_sql_string(str(ad_data.get('Group', '')))
+        gl1 = escape_sql_string(str(ad_data.get('GL1', '')))
+        gl2 = escape_sql_string(str(ad_data.get('GL2', '')))
+        location = escape_sql_string(str(ad_data.get('Location', '')))
         manager = escape_sql_string(str(ad_data.get('Manager', '')))
         is_mgr = str(ad_data.get('IsManager', 0))
         is_exec = str(ad_data.get('IsExecutive', 0))
@@ -214,7 +231,7 @@ def generate_phone_assignment_fix_sql(client_name=None):
         sql_statements.append(f"BEGIN")
         sql_statements.append(f"    INSERT INTO C_{customer_id}_People (")
         sql_statements.append(f"        status, isPerson, lastdate, userid, username, email,")
-        sql_statements.append(f"        phone1, phone2, OU, isMgr, isExec, mgrlevel, mgr,")
+        sql_statements.append(f"        phone1, phone2, OU, [Group], GL1, GL2, Location, isMgr, isExec, mgrlevel, mgr,")
         sql_statements.append(f"        LinkType, TS, Modified")
         sql_statements.append(f"    ) VALUES (")
         sql_statements.append(f"        'Active',")
@@ -226,6 +243,10 @@ def generate_phone_assignment_fix_sql(client_name=None):
         sql_statements.append(f"        '{phone1_clean}',")
         sql_statements.append(f"        '{phone2_clean}',")
         sql_statements.append(f"        '{department}',")
+        sql_statements.append(f"        '{group}',")
+        sql_statements.append(f"        '{gl1}',")
+        sql_statements.append(f"        '{gl2}',")
+        sql_statements.append(f"        '{location}',")
         sql_statements.append(f"        {is_mgr},")
         sql_statements.append(f"        {is_exec},")
         sql_statements.append(f"        '{mgmt_level}',")
@@ -253,15 +274,15 @@ def generate_phone_assignment_fix_sql(client_name=None):
         phone_number = str(row['phone_number']).strip()
         old_user = str(row['service_user']).strip()
         new_user = str(row['ad_user']).strip()
-        sql_statements.append(f"PRINT 'Phone {phone_number}: {old_user} → {new_user} (Dec 2025 & Nov 2025 only)'")
-    sql_statements.append("PRINT 'Only months 202512 and 202511 will be updated'")
+        sql_statements.append(f"PRINT 'Phone {phone_number}: {old_user} → {new_user} ({current_billing_month} & {prior_billing_month} only)'")
+    sql_statements.append(f"PRINT 'Only months {current_billing_month} and {prior_billing_month} will be updated'")
     sql_statements.append("PRINT 'Historical billing data will be preserved'")
     sql_statements.append("")
 
     # Generate UPDATE statements for ServiceDetails
     sql_statements.append("-- ================================================================================")
     sql_statements.append("-- STEP 2: REASSIGN PHONE NUMBERS IN SERVICE DETAILS")
-    sql_statements.append("-- ONLY UPDATES CURRENT MONTHS (Dec 2025 & Nov 2025)")
+    sql_statements.append(f"-- ONLY UPDATES MONTHS {current_billing_month} and {prior_billing_month}")
     sql_statements.append("-- ================================================================================")
     sql_statements.append("")
 
@@ -282,7 +303,7 @@ def generate_phone_assignment_fix_sql(client_name=None):
         sql_statements.append(f"FROM C_{customer_id}_ServiceDetails sd")
         sql_statements.append(f"INNER JOIN C_{customer_id}_People p ON p.username = '{new_user}'")
         sql_statements.append(f"WHERE sd.AssetID = '{phone_clean}'")
-        sql_statements.append(f"  AND sd.DateRef IN ('202512', '202511');  -- Only Dec 2025 & Nov 2025")
+        sql_statements.append(f"  AND sd.DateRef {dateref_filter_sql};")
         sql_statements.append(f"-- Note: Removed Username filter since ServiceDetails.Username is often empty")
         sql_statements.append("")
         update_count += 1
@@ -431,6 +452,13 @@ def generate_single_user_test_sql(client):
     # Get customer ID
     customer_id = get_customer_id()
 
+    # Billing month window used by generated SQL
+    now = datetime.now()
+    prev_month_date = _prev_month_start(now)
+    current_billing_month = prev_month_date.strftime('%Y%m')
+    prior_billing_month = _prev_month_start(prev_month_date).strftime('%Y%m')
+    dateref_filter_sql = f"IN ('{current_billing_month}', '{prior_billing_month}')"
+
     # Generate single user SQL
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "output", client)
@@ -463,7 +491,7 @@ BEGIN
 END;
 
 -- ================================================================================
--- UPDATE SERVICE DETAILS (Dec 2025 & Nov 2025 only)
+    -- UPDATE SERVICE DETAILS ({current_billing_month} & {prior_billing_month} only)
 -- ================================================================================
 
 PRINT 'Updating ServiceDetails for phone {phone_number}...';
@@ -472,10 +500,10 @@ UPDATE sd
 SET sd.UserRef = p.id,
     sd.UserRef_Type = 'AD Fix',
     sd.Username = LEFT(p.username, 20)
-FROM C_{customer_id}_ServiceDetails sd
-INNER JOIN C_{customer_id}_People p ON p.username = '{new_user}'
-WHERE sd.AssetID = '{phone_number}'
-  AND sd.DateRef IN ('202512', '202511');
+ FROM C_{customer_id}_ServiceDetails sd
+ INNER JOIN C_{customer_id}_People p ON p.username = '{new_user}'
+ WHERE sd.AssetID = '{phone_number}'
+  AND sd.DateRef {dateref_filter_sql};
 
 PRINT 'ServiceDetails update completed';
 
@@ -500,10 +528,10 @@ SELECT
     sd.UserRef_Type as Type,
     sd.DateRef as Month,
     p.username as PeopleRecord
-FROM C_{customer_id}_ServiceDetails sd
-LEFT JOIN C_{customer_id}_People p ON sd.UserRef = p.id
-WHERE sd.AssetID = '{phone_number}' AND sd.DateRef IN ('202512', '202511')
-ORDER BY sd.DateRef DESC;
+ FROM C_{customer_id}_ServiceDetails sd
+ LEFT JOIN C_{customer_id}_People p ON sd.UserRef = p.id
+ WHERE sd.AssetID = '{phone_number}' AND sd.DateRef {dateref_filter_sql}
+ ORDER BY sd.DateRef DESC;
 
 PRINT 'TEST COMPLETED - Review results above';
 PRINT 'If good: COMMIT;';
@@ -514,7 +542,7 @@ PRINT 'If bad: ROLLBACK;';
 """
 
     # Write SQL file
-    with open(output_file, 'w') as f:
+    with open(output_file, 'w', encoding='utf-8') as f:
         f.write(sql_content)
 
     print(f"\n💾 Generated single user test SQL: {os.path.basename(output_file)}")

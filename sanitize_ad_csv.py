@@ -33,8 +33,9 @@ def detect_client_format(df):
         return 'northview'
 
     # Gateway format detection (historic format if encountered)
-    gateway_indicators = ['gl1', 'gl2', 'gl3', 'costcenter']
-    if any(indicator in columns for indicator in gateway_indicators):
+    gateway_indicators = ['billingcode', 'billinghub', 'costcenter', 'glcode', 'userid']
+    gateway_matches = sum(1 for indicator in gateway_indicators if indicator in columns)
+    if gateway_matches >= 3:
         return 'gateway'
 
     return 'unknown'
@@ -94,6 +95,16 @@ def extract_manager_info(manager_dn):
     return manager_str, ''
 
 # Note: Synovus/Cenovus format handling moved to sanitize_synovus_ad.py
+def get_column(df, column_names, default_value=''):
+    """Return the first matching column from a list of candidates"""
+    for column_name in column_names:
+        if column_name in df.columns:
+            return df[column_name].fillna(default_value)
+    return pd.Series([default_value] * len(df), index=df.index)
+
+def build_display_name(given_series, surname_series):
+    """Build DisplayName when it's not provided"""
+    return (given_series.fillna('') + ' ' + surname_series.fillna('')).str.strip()
 
 def standardize_northview_format(df):
     """Convert Northview AD format to expected analysis format"""
@@ -103,38 +114,98 @@ def standardize_northview_format(df):
     standardized = pd.DataFrame()
 
     # Basic user info (preserve original column names)
-    standardized['DisplayName'] = df['DisplayName'].fillna('')
-    standardized['cn'] = df['cn'].fillna('')
-    standardized['GivenName'] = df['GivenName'].fillna('')
-    standardized['Surname'] = df['Surname'].fillna('')
-    standardized['UserPrincipalName'] = df['UserPrincipalName'].fillna('')
+    display_name = get_column(df, ['DisplayName', 'displayname'])
+    given_name = get_column(df, ['GivenName', 'givenname'])
+    surname = get_column(df, ['Surname', 'surname'])
+    if display_name.eq('').all():
+        display_name = build_display_name(given_name, surname)
+
+    standardized['DisplayName'] = display_name
+    standardized['cn'] = get_column(df, ['cn', 'CN'])
+    standardized['GivenName'] = given_name
+    standardized['Surname'] = surname
+    standardized['UserPrincipalName'] = get_column(df, ['UserPrincipalName', 'userprincipalname'])
 
     # Department/organizational info
-    standardized['Department'] = df['Department'].fillna('')
-    standardized['Division'] = df['Division'].fillna('')
-    standardized['Manager'] = df['Manager'].fillna('')
-    standardized['BillingCode'] = df['BillingCode'].fillna('')
+    standardized['Department'] = get_column(df, ['Department', 'department'])
+    standardized['Division'] = get_column(df, ['Division', 'division'])
+    standardized['Manager'] = get_column(df, ['Manager', 'manager'])
+    standardized['BillingCode'] = get_column(df, ['BillingCode', 'billingcode'])
+
+    # Additional org fields (optional, pass-through)
+    standardized['Group'] = get_column(df, ['Group', 'group', 'Group Name', 'GroupName', 'Group_Name', 'AD Group', 'ADGroup'])
+    standardized['GL1'] = get_column(df, ['Cost Center - GL1', 'Cost Center-GL1', 'CostCenterGL1', 'GL1', 'Cost Center', 'CostCenter', 'BillingCode', 'billingcode'])
+    standardized['GL2'] = get_column(df, ['Cost Center 2 - GL2', 'Cost Center 2-GL2', 'CostCenter2GL2', 'GL2', 'GLCode', 'glcode', 'Cost Center 2', 'CostCenter2'])
+    standardized['Location'] = get_column(df, ['Location', 'location', 'Office', 'office', 'City', 'city'])
 
     # Status field (keep original Enabled column name)
-    standardized['Enabled'] = df['Enabled'].fillna(0)
+    standardized['Enabled'] = get_column(df, ['Enabled', 'enabled'], 0)
 
     # Phone numbers (keep original column names that analysis expects)
-    standardized['mobile'] = df['mobile'].apply(normalize_phone_number)
-    standardized['telephoneNumber'] = df['telephoneNumber'].apply(normalize_phone_number)
+    standardized['mobile'] = get_column(df, ['mobile', 'Mobile']).apply(normalize_phone_number)
+    standardized['telephoneNumber'] = get_column(df, ['telephoneNumber', 'TelephoneNumber']).apply(normalize_phone_number)
 
     # Additional fields from original format
-    standardized['Title'] = df['Title'].fillna('')
-    standardized['Office'] = df['Office'].fillna('')
-    standardized['Street'] = df['Street'].fillna('')
-    standardized['City'] = df['City'].fillna('')
-    standardized['State'] = df['State'].fillna('')
-    standardized['SID'] = df['SID'].fillna('')
-    standardized['DistinguishedName'] = df['DistinguishedName'].fillna('')
-    standardized['whenCreated'] = df['whenCreated'].fillna('')
-    standardized['AccountExpires'] = df['AccountExpires'].fillna('')
-    standardized['whenChanged'] = df['whenChanged'].fillna('')
+    standardized['Title'] = get_column(df, ['Title', 'title'])
+    standardized['Office'] = get_column(df, ['Office', 'office'])
+    standardized['Street'] = get_column(df, ['Street', 'street'])
+    standardized['City'] = get_column(df, ['City', 'city'])
+    standardized['State'] = get_column(df, ['State', 'state', 'Province', 'province'])
+    standardized['SID'] = get_column(df, ['SID', 'sid'])
+    standardized['DistinguishedName'] = get_column(df, ['DistinguishedName', 'distinguishedname'])
+    standardized['whenCreated'] = get_column(df, ['whenCreated', 'WhenCreated'])
+    standardized['AccountExpires'] = get_column(df, ['AccountExpires', 'accountexpires'])
+    standardized['whenChanged'] = get_column(df, ['whenChanged', 'WhenChanged'])
 
     print(f"  ✅ Converted {len(standardized)} Northview records to analysis format")
+    return standardized
+
+def standardize_gateway_format(df):
+    """Convert Gateway AD format to expected analysis format"""
+    print("  ?? Converting Gateway format to standard analysis format...")
+
+    standardized = pd.DataFrame(index=df.index)
+
+    given_name = get_column(df, ['GivenName', 'givenname'])
+    surname = get_column(df, ['Surname', 'surname'])
+    display_name = get_column(df, ['DisplayName', 'displayname'])
+    if display_name.eq('').all():
+        display_name = build_display_name(given_name, surname)
+
+    standardized['DisplayName'] = display_name
+    standardized['cn'] = display_name
+    standardized['GivenName'] = given_name
+    standardized['Surname'] = surname
+    standardized['UserPrincipalName'] = get_column(df, ['UserPrincipalName', 'userprincipalname'])
+
+    standardized['Department'] = get_column(df, ['Department', 'department'])
+    standardized['Division'] = get_column(df, ['Division', 'division'])
+    standardized['Manager'] = get_column(df, ['Manager', 'manager'])
+    standardized['BillingCode'] = get_column(df, ['BillingCode', 'billingcode'])
+
+    # Additional org fields (optional, pass-through)
+    standardized['Group'] = get_column(df, ['Group', 'group', 'Group Name', 'GroupName', 'Group_Name', 'AD Group', 'ADGroup'])
+    standardized['GL1'] = get_column(df, ['Cost Center - GL1', 'Cost Center-GL1', 'CostCenterGL1', 'GL1', 'Cost Center', 'CostCenter', 'BillingCode', 'billingcode'])
+    standardized['GL2'] = get_column(df, ['Cost Center 2 - GL2', 'Cost Center 2-GL2', 'CostCenter2GL2', 'GL2', 'Cost Center 2', 'CostCenter2'])
+    standardized['Location'] = get_column(df, ['Location', 'location', 'Office', 'office', 'City', 'city'])
+
+    standardized['Enabled'] = get_column(df, ['Enabled', 'enabled'], 0)
+
+    standardized['mobile'] = get_column(df, ['Mobile', 'mobile']).apply(normalize_phone_number)
+    standardized['telephoneNumber'] = get_column(df, ['TelephoneNumber', 'telephoneNumber']).apply(normalize_phone_number)
+
+    standardized['Title'] = get_column(df, ['Title', 'title'])
+    standardized['Office'] = get_column(df, ['Office', 'office'])
+    standardized['Street'] = get_column(df, ['Street', 'street'])
+    standardized['City'] = get_column(df, ['City', 'city'])
+    standardized['State'] = get_column(df, ['Province', 'province', 'State', 'state'])
+    standardized['SID'] = get_column(df, ['SID', 'sid'])
+    standardized['DistinguishedName'] = get_column(df, ['DistinguishedName', 'distinguishedname'])
+    standardized['whenCreated'] = get_column(df, ['WhenCreated', 'whenCreated'])
+    standardized['AccountExpires'] = get_column(df, ['AccountExpires', 'accountexpires'])
+    standardized['whenChanged'] = get_column(df, ['whenChanged', 'WhenChanged'])
+
+    print(f"  ? Converted {len(standardized)} Gateway records to analysis format")
     return standardized
 
 def get_available_ad_files():
@@ -224,8 +295,7 @@ def process_ad_file(ad_file_path):
         if client_format == 'northview':
             standardized_df = standardize_northview_format(df)
         elif client_format == 'gateway':
-            print("⚠️  Gateway format detected - using Northview processing")
-            standardized_df = standardize_northview_format(df)
+            standardized_df = standardize_gateway_format(df)
         else:
             print(f"❌ Unsupported format: {client_format}")
             return False
@@ -295,11 +365,10 @@ def main():
         if client_format == 'northview':
             standardized_df = standardize_northview_format(df)
         elif client_format == 'gateway':
-            print("⚠️  Gateway format detected - using Northview processing")
-            standardized_df = standardize_northview_format(df)
+            standardized_df = standardize_gateway_format(df)
         else:
             print(f"❌ Unsupported format: {client_format}")
-            print("   Supported formats: Northview")
+            print("   Supported formats: Northview, Gateway")
             print("   📝 Note: For Synovus/Cenovus files, use: python3 sanitize_synovus_ad.py")
             return
 
@@ -322,7 +391,7 @@ def main():
 
         # Show sample of key fields
         print("\n📋 SAMPLE OF SANITIZED DATA:")
-        sample_cols = ['userid', 'username', 'status', 'phone1', 'phone2', 'OU', 'isMgr', 'mgr', 'GL1']
+        sample_cols = ['userid', 'username', 'status', 'phone1', 'phone2', 'OU', 'Group', 'GL1', 'GL2', 'Location', 'isMgr', 'mgr']
         available_cols = [col for col in sample_cols if col in standardized_df.columns]
         if len(standardized_df) > 0:
             print(standardized_df[available_cols].head(3).to_string(index=False))
