@@ -292,7 +292,9 @@ class SpikeFliDataAnalyzer:
             return
 
         # Build Active Directory phone mapping (RAW NUMBERS ONLY)
-        ad_phone_map = {}  # clean_phone -> {'name': str, 'enabled': bool}
+        # NOTE: Multiple enabled AD accounts can share the same phone number. Keep all candidates and
+        # resolve per-service-entry later to avoid silent overwrites ("two account names" issue).
+        ad_phone_map = {}  # clean_phone -> list[{'name': str, 'enabled': bool, 'original_phone': str}]
         enabled_ad_users = self.ad_data[self.ad_data['Enabled'] == True].copy()
 
         print(f"📞 Processing {len(enabled_ad_users)} enabled AD users...")
@@ -317,23 +319,34 @@ class SpikeFliDataAnalyzer:
                 print(f"  🔍 DEBUG - Sarah Walker phones: {phones}")
 
             # Process each phone number - CLEAN TO RAW DIGITS ONLY
+            seen_clean_phones = set()
             for phone_raw in phones:
                 clean_phone = ''.join(filter(str.isdigit, phone_raw))
                 if len(clean_phone) == 10:  # Valid 10-digit North American number
+                    if clean_phone in seen_clean_phones:
+                        continue
+                    seen_clean_phones.add(clean_phone)
                     user_info = {
                         'name': user['DisplayName'],
                         'enabled': user['Enabled'],
                         'original_phone': phone_raw
                     }
 
-                    # Store ONLY the clean version for reliable matching
-                    ad_phone_map[clean_phone] = user_info  # 4034660988
+                    # Store ONLY the clean version for reliable matching (keep all candidates)
+                    ad_phone_map.setdefault(clean_phone, []).append(user_info)  # 4034660988
 
                     # Debug: Check if we just added Sarah Walker's phone
                     if clean_phone == '4034660988':
                         print(f"  ✅ DEBUG - Added Sarah Walker's phone {clean_phone} to AD map")
 
         print(f"✅ Built AD phone map with {len(ad_phone_map)} phone numbers")
+
+        # Identify duplicate enabled AD users sharing the same phone number
+        ad_phone_duplicates = {k: v for k, v in ad_phone_map.items() if len(v) > 1}
+        if ad_phone_duplicates:
+            print(f"  ⚠️  Found {len(ad_phone_duplicates)} phone numbers shared by multiple enabled AD users")
+        else:
+            print(f"  ✅ No phone numbers shared by multiple enabled AD users")
 
         # Debug: Show some examples of what's in the AD phone map
         sample_phones = list(ad_phone_map.keys())[:10]
@@ -362,12 +375,44 @@ class SpikeFliDataAnalyzer:
             # Username is now clean, status is in dedicated column
             clean_service_name = service_username
             is_expired_in_service = (service_status == 'EXPIRED')
+            is_account_name_entry = clean_service_name.lower().startswith('account name:')
 
             # AssetID should now be CLEAN (digits only) - check if it exists in AD
             if asset_id in ad_phone_map:
-                ad_info = ad_phone_map[asset_id]
-                ad_name = ad_info['name']
-                ad_enabled = ad_info['enabled']
+                ad_candidates = ad_phone_map.get(asset_id, [])
+
+                resolved_ad = None
+                if len(ad_candidates) == 1:
+                    resolved_ad = ad_candidates[0]
+                elif len(ad_candidates) > 1:
+                    # Try to resolve by matching Service Overview username to an AD DisplayName
+                    matches = [c for c in ad_candidates if str(c.get('name', '')).strip().lower() == clean_service_name.lower()]
+                    if len(matches) == 1:
+                        resolved_ad = matches[0]
+                    else:
+                        candidate_names = sorted({c.get('name') for c in ad_candidates if c.get('name')})
+                        status_mismatches.append({
+                            'phone_number': asset_id,
+                            'issue': 'Ambiguous AD Owner',
+                            'service_user': service_username,
+                            'ad_user': '; '.join(candidate_names) if candidate_names else 'AMBIGUOUS',
+                            'problem': 'Multiple enabled AD users share this phone number; cannot determine a single owner'
+                        })
+                        # Still record cross-reference visibility, but skip reassignment/status logic
+                        phone_cross_reference.append({
+                            'phone_number': asset_id,
+                            'service_overview_user': service_username,
+                            'service_clean_name': clean_service_name,
+                            'service_expired': is_expired_in_service,
+                            'ad_user': '; '.join(candidate_names) if candidate_names else 'AMBIGUOUS',
+                            'ad_enabled': None,
+                            'users_match': False,
+                            'status_consistent': None
+                        })
+                        continue
+
+                ad_name = resolved_ad['name']
+                ad_enabled = resolved_ad['enabled']
 
                 # This is a MATCH - phone exists in both systems
                 phone_cross_reference.append({
@@ -389,7 +434,7 @@ class SpikeFliDataAnalyzer:
                         'ad_user': ad_name,
                         'service_status': 'Expired' if is_expired_in_service else 'Active',
                         'ad_status': 'Enabled' if ad_enabled else 'Disabled',
-                        'change_type': 'Phone Number Reassignment'
+                        'change_type': 'Manual Review - Service Username is Account Name:' if is_account_name_entry else 'Phone Number Reassignment'
                     })
 
                 # Check for status mismatch
