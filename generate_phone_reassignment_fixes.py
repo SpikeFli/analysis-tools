@@ -103,6 +103,100 @@ def find_latest_phone_reassignment_file():
 
     return max(candidates, key=os.path.getmtime)
 
+def infer_client_name_from_output_path(phone_reassignments_path):
+    """
+    Infer client name from output folder structure.
+
+    Expected patterns:
+      output/{ClientName}/phone_reassignments_*.csv  -> returns {ClientName}
+      output/phone_reassignments_*.csv               -> returns None
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_dir = os.path.join(script_dir, "output")
+
+    try:
+        rel = os.path.relpath(phone_reassignments_path, output_dir)
+    except Exception:
+        return None
+
+    parts = [p for p in rel.split(os.sep) if p and p not in (".", "..")]
+    if len(parts) >= 2:
+        return parts[0]
+    return None
+
+def infer_client_name_from_duplicate_output_files(phone_reassignments_path):
+    """
+    If the phone reassignments file lives in root output/, try to find a client subfolder
+    that contains a file with the same basename.
+
+    Returns client name if uniquely identified, otherwise None.
+    """
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    output_dir = os.path.join(script_dir, "output")
+    basename = os.path.basename(phone_reassignments_path)
+
+    if not basename.startswith("phone_reassignments_") or not basename.lower().endswith(".csv"):
+        return None
+
+    matches = []
+    try:
+        for item in os.listdir(output_dir):
+            client_dir = os.path.join(output_dir, item)
+            if not os.path.isdir(client_dir) or item.startswith("."):
+                continue
+            candidate = os.path.join(client_dir, basename)
+            if os.path.isfile(candidate):
+                matches.append(item)
+    except Exception:
+        return None
+
+    return matches[0] if len(matches) == 1 else None
+
+def find_latest_sanitized_ad_file(client_name):
+    """Find the most recent *_SANITIZED.csv under ActiveDirectory_input/{client_name}/"""
+    if not client_name:
+        return None
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    client_ad_dir = os.path.join(script_dir, "ActiveDirectory_input", client_name)
+    if not os.path.isdir(client_ad_dir):
+        return None
+
+    candidates = []
+    try:
+        for f in os.listdir(client_ad_dir):
+            if not f.lower().endswith("_sanitized.csv"):
+                continue
+            path = os.path.join(client_ad_dir, f)
+            if os.path.isfile(path):
+                candidates.append(path)
+    except Exception:
+        return None
+
+    if not candidates:
+        return None
+
+    return max(candidates, key=os.path.getmtime)
+
+def _clean_phone(value):
+    if value is None:
+        return ""
+    if isinstance(value, float):
+        if pd.isna(value):
+            return ""
+        # Avoid "4036604056.0" -> "40366040560"
+        if value.is_integer():
+            return str(int(value))
+    s = str(value).strip()
+    if not s or s.lower() == "nan":
+        return ""
+    if s.endswith(".0"):
+        s = s[:-2]
+    return "".join(ch for ch in s if ch.isdigit())
+
+def _is_true(value):
+    return str(value).strip().lower() == "true"
+
 def generate_phone_reassignment_fix_sql(customer_id=None, dateref_months=None):
     """Generate SQL to fix phone reassignments"""
 
@@ -139,6 +233,26 @@ def generate_phone_reassignment_fix_sql(customer_id=None, dateref_months=None):
         print(f"Error reading phone reassignments file: {e}")
         return
 
+    # Try to load AD data so we can insert missing People records for reassignment targets.
+    client_name = infer_client_name_from_output_path(phone_file) or infer_client_name_from_duplicate_output_files(phone_file)
+    ad_file = find_latest_sanitized_ad_file(client_name) if client_name else None
+    ad_by_display_name = {}
+    if ad_file:
+        try:
+            ad_df = pd.read_csv(ad_file)
+            if "DisplayName" in ad_df.columns:
+                if "Enabled" in ad_df.columns:
+                    enabled_mask = ad_df["Enabled"].apply(_is_true)
+                    ad_df = ad_df[enabled_mask]
+                for _, r in ad_df.iterrows():
+                    name = str(r.get("DisplayName", "")).strip()
+                    if name and name.lower() != "nan":
+                        ad_by_display_name.setdefault(name, r)
+            print(f"Using AD sanitized file: {os.path.basename(ad_file)}")
+        except Exception as e:
+            print(f"Warning: could not load AD sanitized file for inserts ({e}). Proceeding without inserts.")
+            ad_by_display_name = {}
+
     # Generate SQL
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -157,6 +271,67 @@ def generate_phone_reassignment_fix_sql(customer_id=None, dateref_months=None):
     sql_statements.append("")
     sql_statements.append("BEGIN TRANSACTION;")
     sql_statements.append("")
+
+    # Insert missing People records (if possible)
+    current_billing_month = (dateref_months or [""])[0]
+    if ad_by_display_name:
+        sql_statements.append("-- STEP 0: ENSURE AD USERS EXIST IN PEOPLE (INSERT IF MISSING)")
+        sql_statements.append("-- ================================================================================")
+        sql_statements.append("-- This prevents 0-row updates when the target AD user is not present in People.")
+        sql_statements.append("")
+
+        inserted_users = set()
+        for _, row in phone_df.iterrows():
+            new_user = escape_sql_string(row.get("ad_user", ""))
+            if not new_user or new_user in inserted_users:
+                continue
+            inserted_users.add(new_user)
+
+            ad_row = ad_by_display_name.get(str(row.get("ad_user", "")).strip())
+            if ad_row is None:
+                sql_statements.append(f"-- NOTE: AD details not found for '{new_user}' in sanitized AD file; cannot auto-insert People record.")
+                sql_statements.append("")
+                continue
+
+            email = escape_sql_string(ad_row.get("UserPrincipalName", "") or "")
+            cn = str(ad_row.get("cn", "") or "").strip()
+            userid = escape_sql_string(cn if cn else (email.split("@")[0] if email else ""))
+            department = escape_sql_string(ad_row.get("Department", "") or "")
+            manager = escape_sql_string(ad_row.get("Manager", "") or "")
+
+            # Use the reassigned phone number as phone1; keep AD mobile as phone2 when available.
+            phone_number = str(row.get("phone_number", "") or "")
+            phone1_clean = _clean_phone(phone_number)
+            phone2_clean = _clean_phone(ad_row.get("mobile", ""))
+
+            sql_statements.append(f"-- Insert {new_user} ONLY if they don't already exist")
+            sql_statements.append(f"IF NOT EXISTS (SELECT 1 FROM C_{customer_id}_People WHERE username = '{new_user}')")
+            sql_statements.append("BEGIN")
+            sql_statements.append(f"    INSERT INTO C_{customer_id}_People (")
+            sql_statements.append("        status, isPerson, lastdate, userid, username, email,")
+            sql_statements.append("        phone1, phone2, OU, isMgr, isExec, mgrlevel, mgr,")
+            sql_statements.append("        LinkType, TS, Modified")
+            sql_statements.append("    ) VALUES (")
+            sql_statements.append("        'Active',")
+            sql_statements.append("        1,")
+            sql_statements.append(f"        '{escape_sql_string(current_billing_month)}',")
+            sql_statements.append(f"        '{userid}',")
+            sql_statements.append(f"        '{new_user}',")
+            sql_statements.append(f"        '{email}',")
+            sql_statements.append(f"        '{phone1_clean}',")
+            sql_statements.append(f"        '{phone2_clean}',")
+            sql_statements.append(f"        '{department}',")
+            sql_statements.append("        0,")
+            sql_statements.append("        0,")
+            sql_statements.append("        '',")
+            sql_statements.append(f"        '{manager}',")
+            sql_statements.append("        'AD',")
+            sql_statements.append("        GETDATE(),")
+            sql_statements.append(f"        '{escape_sql_string(current_billing_month)}'")
+            sql_statements.append("    );")
+            sql_statements.append(f"    PRINT 'Inserted missing People user: {new_user}';")
+            sql_statements.append("END;")
+            sql_statements.append("")
 
     # Ensure phone is stored on People (phone1/phone2)
     sql_statements.append("-- STEP 1: ENSURE PHONE NUMBER IS STORED ON PEOPLE (phone1/phone2)")

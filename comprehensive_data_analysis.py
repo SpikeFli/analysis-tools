@@ -41,20 +41,51 @@ class SpikeFliDataAnalyzer:
         service_df = pd.read_csv(service_path)
         print(f"  📂 Loaded {len(service_df)} original Service Overview records")
 
+        # Normalize schema differences across client exports.
+        asset_column_candidates = ['AssetID', 'Phone1', 'Phone', 'Phone Number', 'PhoneNumber', 'telephoneNumber', 'mobile']
+        username_column_candidates = ['Username', 'UserName', 'DisplayName', 'Name', 'UserID']
+        status_column_candidates = ['STATUS', 'Status', 'UserStatus']
+
+        asset_col = next((c for c in asset_column_candidates if c in service_df.columns), None)
+        username_col = next((c for c in username_column_candidates if c in service_df.columns), None)
+        status_col = next((c for c in status_column_candidates if c in service_df.columns), None)
+
+        if not asset_col:
+            raise ValueError(
+                f"Service Overview file is missing a phone/asset column. "
+                f"Expected one of {asset_column_candidates}, got: {list(service_df.columns)}"
+            )
+        if not username_col:
+            raise ValueError(
+                f"Service Overview file is missing a username column. "
+                f"Expected one of {username_column_candidates}, got: {list(service_df.columns)}"
+            )
+
         # Clean AssetID column - remove all formatting
         def clean_asset_id(asset_id):
             if pd.isna(asset_id):
                 return asset_id
-            # Convert to string and remove all non-digit characters
-            cleaned = ''.join(filter(str.isdigit, str(asset_id)))
+            # Normalize numeric-like values (e.g. 4035137736.0) before stripping formatting.
+            if isinstance(asset_id, (float, np.floating)):
+                if np.isnan(asset_id):
+                    return asset_id
+                asset_str = str(int(asset_id))
+            else:
+                asset_str = str(asset_id).strip()
+                if asset_str.endswith('.0'):
+                    asset_str = asset_str[:-2]
+
+            # Convert to string and remove all non-digit characters.
+            cleaned = ''.join(filter(str.isdigit, asset_str))
             return cleaned if cleaned else asset_id
 
         # Extract status and clean username
-        def extract_status_and_clean_username(username):
+        def extract_status_and_clean_username(username, raw_status=None):
             if pd.isna(username):
-                return username, 'ACTIVE'  # Default to ACTIVE if no username
+                username = ''
 
             username_str = str(username).strip()
+            status_str = str(raw_status).strip().lower() if pd.notna(raw_status) else ''
 
             # Check for expired indicators - ONLY (D: Expired) should be marked as EXPIRED
             if '(D: Expired)' in username_str:
@@ -64,17 +95,24 @@ class SpikeFliDataAnalyzer:
                 # (D) should remain ACTIVE - just clean the username but keep status ACTIVE
                 clean_username = username_str.replace('(D)', '').strip()
                 return clean_username, 'ACTIVE'
+            elif status_str in {'expired', 'inactive', 'disabled', 'terminated'}:
+                return username_str, 'EXPIRED'
+            elif status_str in {'active', 'enabled'}:
+                return username_str, 'ACTIVE'
             else:
                 return username_str, 'ACTIVE'
 
         # Create cleaned copy
         cleaned_df = service_df.copy()
 
-        # Clean AssetID
-        cleaned_df['AssetID'] = cleaned_df['AssetID'].apply(clean_asset_id)
+        # Build canonical columns used by the rest of the analyzer.
+        cleaned_df['AssetID'] = cleaned_df[asset_col].apply(clean_asset_id)
 
         # Extract status and clean username
-        username_status = cleaned_df['Username'].apply(extract_status_and_clean_username)
+        username_status = cleaned_df.apply(
+            lambda row: extract_status_and_clean_username(row[username_col], row[status_col] if status_col else None),
+            axis=1
+        )
         cleaned_df['Username'] = [item[0] for item in username_status]
         cleaned_df['STATUS'] = [item[1] for item in username_status]
 
@@ -92,10 +130,10 @@ class SpikeFliDataAnalyzer:
             if examples >= 5:
                 break
 
-            original_asset = str(row['AssetID'])
-            cleaned_asset = clean_asset_id(row['AssetID'])
-            original_username = str(row['Username'])
-            cleaned_username, status = extract_status_and_clean_username(row['Username'])
+            original_asset = str(row[asset_col])
+            cleaned_asset = clean_asset_id(row[asset_col])
+            original_username = str(row[username_col])
+            cleaned_username, status = extract_status_and_clean_username(row[username_col], row[status_col] if status_col else None)
 
             if ('(D:' in original_username or original_asset != cleaned_asset) and len(original_asset) > 5:
                 print(f"    AssetID: {original_asset} → {cleaned_asset}")
@@ -364,8 +402,16 @@ class SpikeFliDataAnalyzer:
         phone_reassignments = []
         status_mismatches = []
 
+        def normalize_phone(value):
+            if pd.isna(value):
+                return ''
+            value_str = str(value).strip()
+            if value_str.endswith('.0'):
+                value_str = value_str[:-2]
+            return ''.join(filter(str.isdigit, value_str))
+
         for _, service_entry in self.service_data.iterrows():
-            asset_id = str(service_entry.get('AssetID', '')).strip()
+            asset_id = normalize_phone(service_entry.get('AssetID', ''))
             service_username = str(service_entry.get('Username', '')).strip()
             service_status = str(service_entry.get('STATUS', 'ACTIVE')).strip()
 
@@ -500,7 +546,7 @@ class SpikeFliDataAnalyzer:
 
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         md_file = os.path.join(client_output_dir, f"SpikeFli_Analysis_Report_{timestamp}.md")
-        with open(md_file, 'w') as f:
+        with open(md_file, 'w', encoding='utf-8') as f:
             f.write(f"# SpikeFli Data Analysis Report\n\n")
             f.write(f"**Generated:** {datetime.now().strftime('%B %d, %Y at %I:%M %p')}\n\n")
             f.write(f"---\n\n")
@@ -517,13 +563,14 @@ class SpikeFliDataAnalyzer:
                 user_mismatches = len(phone_reassignments)
                 user_matches = total_phones_analyzed - user_mismatches
                 status_consistent = total_phones_analyzed  # Assuming all matched phones have consistent status
+                pct_denom = total_phones_analyzed if total_phones_analyzed > 0 else 1
 
                 f.write(f"### 📱 Phone Number Analysis ({total_phones_analyzed} phones analyzed)\n\n")
                 f.write(f"| Metric | Count | Percentage | Status |\n")
                 f.write(f"|--------|-------|------------|--------|\n")
-                f.write(f"| **Users Match Correctly** | **{user_matches}** | **{user_matches/total_phones_analyzed*100:.1f}%** | ✅ Good |\n")
-                f.write(f"| **User Mismatches** | **{user_mismatches}** | **{user_mismatches/total_phones_analyzed*100:.1f}%** | 🚨 Needs Fix |\n")
-                f.write(f"| Status Consistency | {status_consistent} | {status_consistent/total_phones_analyzed*100:.1f}% | ✅ Good |\n\n")
+                f.write(f"| **Users Match Correctly** | **{user_matches}** | **{user_matches/pct_denom*100:.1f}%** | ✅ Good |\n")
+                f.write(f"| **User Mismatches** | **{user_mismatches}** | **{user_mismatches/pct_denom*100:.1f}%** | 🚨 Needs Fix |\n")
+                f.write(f"| Status Consistency | {status_consistent} | {status_consistent/pct_denom*100:.1f}% | ✅ Good |\n\n")
 
                 f.write(f"**🔍 What User Mismatches Mean:**\n")
                 f.write(f"When a phone number shows **different users** in Service Overview vs Active Directory:\n")
@@ -866,12 +913,8 @@ class SpikeFliDataAnalyzer:
                     df.to_csv(worst_case_file, index=False)
                     print(f"  ✅ Worst Case Mismatches CSV: {worst_case_file} ({len(worst_cases)} cases)")
 
-            # Phone Reassignments report (CRITICAL)
-            if self.results['cross_reference']['phone_reassignments']:
-                reassign_file = os.path.join(output_dir, f"phone_reassignments_{timestamp}.csv")
-                df = pd.DataFrame(self.results['cross_reference']['phone_reassignments'])
-                df.to_csv(reassign_file, index=False)
-                print(f"  ✅ Phone Reassignments CSV: {reassign_file}")
+            # NOTE: phone_reassignments are intentionally written only to the client output folder
+            # to avoid ambiguous "latest file" selection across different clients.
 
     def run_full_analysis(self, ad_path, service_path, people_path, user_mgmt_path, client_name=None):
         """Run complete analysis"""
@@ -955,6 +998,8 @@ def scan_available_clients():
         if os.path.exists(client_input_dir):
             service_dir = os.path.join(client_input_dir, "service_overview")
             user_mgmt_dir = os.path.join(client_input_dir, "user_management")
+            if not os.path.exists(user_mgmt_dir):
+                user_mgmt_dir = os.path.join(client_input_dir, "user_managment")
             people_dir = os.path.join(client_input_dir, "people_database")
 
             service_path = find_latest_file_recursive(service_dir, "*.csv")
