@@ -18,9 +18,43 @@ ActiveDirectory_input/
 import os
 import sys
 import glob
-import pandas as pd
+import csv
 from datetime import datetime
 from pathlib import Path
+
+
+def _configure_console_utf8() -> None:
+    """
+    Best-effort: avoid UnicodeEncodeError on Windows consoles with legacy code pages.
+    """
+    for stream in (sys.stdout, sys.stderr):
+        if hasattr(stream, "reconfigure"):
+            try:
+                stream.reconfigure(encoding="utf-8")
+            except Exception:
+                pass
+
+
+def _print_missing_deps_and_exit(missing_module: str) -> None:
+    print(f"❌ Missing Python dependency: {missing_module}")
+    print()
+    print("Install dependencies for this repo:")
+    print("  python -m pip install -r requirements.txt")
+    print()
+    print("If you're using a virtual environment:")
+    print("  python -m venv .venv")
+    print("  # Windows PowerShell:")
+    print("  .\\.venv\\Scripts\\Activate.ps1")
+    print("  # Linux/WSL:")
+    print("  source .venv/bin/activate")
+    print("  python -m pip install -r requirements.txt")
+    raise SystemExit(2)
+
+
+try:
+    import pandas as pd  # type: ignore
+except ModuleNotFoundError:
+    pd = None
 
 def detect_client_from_filename(filename):
     """Detect client from filename patterns"""
@@ -38,8 +72,20 @@ def detect_client_from_filename(filename):
 def detect_client_from_content(filepath):
     """Detect client from file content/columns"""
     try:
-        df = pd.read_csv(filepath, nrows=0)  # Just read headers
-        columns = [col.lower() for col in df.columns]
+        if pd is not None:
+            df = pd.read_csv(filepath, nrows=0)  # Just read headers
+            columns = [str(col).lower() for col in df.columns]
+        else:
+            with open(filepath, "r", encoding="utf-8-sig", newline="") as f:
+                sample = f.read(65536)
+                f.seek(0)
+                try:
+                    dialect = csv.Sniffer().sniff(sample, delimiters=[",", ";", "\t", "|"])
+                except Exception:
+                    dialect = csv.excel
+                reader = csv.reader(f, dialect)
+                header = next(reader, [])
+                columns = [str(col).strip().lower() for col in header]
 
         # Synovus indicators
         synovus_indicators = ['personstatus', 'tele', 'userid', 'cost center', 'managerdn']
@@ -81,9 +127,10 @@ def find_ad_files():
 
     # Also check root input directory for backward compatibility
     patterns = ["*.csv", "*.CSV"]
-    root_files = glob.glob(os.path.join(base_input_dir, pattern))
-    root_files = [f for f in root_files if not f.endswith('_SANITIZED.csv')]
-    files.extend([(f, 'root') for f in root_files])
+    for pattern in patterns:
+        root_files = glob.glob(os.path.join(base_input_dir, pattern))
+        root_files = [f for f in root_files if not f.endswith('_SANITIZED.csv')]
+        files.extend([(f, 'root') for f in root_files])
     return files
 
 def main():
@@ -170,6 +217,8 @@ def main():
             from sanitize_synovus_ad import sanitize_synovus_ad
             success = sanitize_synovus_ad(selected_file)
         except ImportError as e:
+            if isinstance(e, ModuleNotFoundError) and getattr(e, "name", None) == "pandas":
+                _print_missing_deps_and_exit("pandas")
             print(f"❌ Could not import Synovus sanitizer: {e}")
             print("   Make sure sanitize_synovus_ad.py exists")
             return
@@ -179,6 +228,8 @@ def main():
             from sanitize_ad_csv import process_ad_file
             success = process_ad_file(selected_file)
         except ImportError as e:
+            if isinstance(e, ModuleNotFoundError) and getattr(e, "name", None) == "pandas":
+                _print_missing_deps_and_exit("pandas")
             print(f"❌ Could not import Northview sanitizer: {e}")
             print("   Make sure sanitize_ad_csv.py exists")
             return
@@ -193,6 +244,7 @@ def main():
 
 if __name__ == "__main__":
     try:
+        _configure_console_utf8()
         main()
     except KeyboardInterrupt:
         print("\n🛑 Operation cancelled by user")

@@ -112,5 +112,15 @@ The script generates:
 
 Install dependencies:
 ```bash
-pip3 install pandas numpy
+python -m pip install -r requirements.txt
+```
+
+If you want an isolated environment (recommended):
+```bash
+python -m venv .venv
+# Windows PowerShell:
+.\.venv\Scripts\Activate.ps1
+# Linux/WSL:
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 ```

@@ -1,18 +1,18 @@
 # SpikeFli Data Analysis Report
 
-**Generated:** March 06, 2026 at 10:11 AM
+**Generated:** March 30, 2026 at 01:03 PM
 
 ---
 
 ## 🎯 Key Metrics Summary
 
-### 📱 Phone Number Analysis (480 phones analyzed)
+### 📱 Phone Number Analysis (450 phones analyzed)
 
 | Metric | Count | Percentage | Status |
 |--------|-------|------------|--------|
-| **Users Match Correctly** | **480** | **100.0%** | ✅ Good |
+| **Users Match Correctly** | **450** | **100.0%** | ✅ Good |
 | **User Mismatches** | **0** | **0.0%** | 🚨 Needs Fix |
-| Status Consistency | 480 | 100.0% | ✅ Good |
+| Status Consistency | 450 | 100.0% | ✅ Good |
 
 **🔍 What User Mismatches Mean:**
 When a phone number shows **different users** in Service Overview vs Active Directory:
@@ -22,12 +22,12 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 - **Impact:** Billing/services assigned to wrong person
 - **Solution:** Update Service Overview to match Active Directory
 
-### 🚨 Critical Status Issues (142 total)
+### 🚨 Critical Status Issues (187 total)
 
 | Issue Type | Count | Impact | Priority |
 |------------|-------|--------|----------|
 | Phone Assignment Issues | 0 | Active employees can't access their phones | 🔴 High |
-| **Should be EXPIRED** | **142** | **Paying for unused services** | **🔴 Critical** |
+| **Should be EXPIRED** | **187** | **Paying for unused services** | **🔴 Critical** |
 | Correctly EXPIRED | 0 | No action needed | ✅ Good |
 
 **🔍 What These Issues Mean:**
@@ -38,21 +38,21 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 
 | Metric | Count | Percentage |
 |--------|-------|------------|
-| Total Users | 1346 | 100% |
-| **Enabled Users** | **1041** | **77.3%** |
-| Disabled Users | 305 | 22.7% |
-| Users with Mobile | 309 | 23.0% |
-| Users with Phone | 655 | 48.7% |
+| Total Users | 1361 | 100% |
+| **Enabled Users** | **973** | **71.5%** |
+| Disabled Users | 388 | 28.5% |
+| Users with Mobile | 309 | 22.7% |
+| Users with Phone | 655 | 48.1% |
 
 ## 👥 User Management System Analysis
 
 | Metric | Count | Percentage |
 |--------|-------|------------|
-| Total User Records | 1995 | 100% |
-| **Active Users** | **1164** | **58.3%** |
-| Expired Users | 829 | 41.6% |
-| AD-Sourced Records | 1973 | 98.9% |
-| Other Sources | 22 | 1.1% |
+| Total User Records | 1996 | 100% |
+| **Active Users** | **1165** | **58.4%** |
+| Expired Users | 829 | 41.5% |
+| AD-Sourced Records | 1973 | 98.8% |
+| Other Sources | 23 | 1.2% |
 
 ## 🗃️ People Database Analysis
 
@@ -69,11 +69,11 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 
 | Metric | Count |
 |--------|-------|
-| Total Entries with Users | 696 |
-| Active Entries | 928 |
-| Expired Entries | 74 |
+| Total Entries with Users | 719 |
+| Active Entries | 943 |
+| Expired Entries | 82 |
 
-## 📞 Phone Number Cross-Reference Analysis (480 phones matched)
+## 📞 Phone Number Cross-Reference Analysis (450 phones matched)
 
 **THIS IS THE CORE ANALYSIS:** Shows how phone numbers match between Service Overview and Active Directory:
 
@@ -81,7 +81,6 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 |--------------|----------------------|---------|-------------|-------------------|
 | 2046985001 | Edbert Tanaldo | Edbert Tanaldo | ✅ YES | ✅ YES |
 | 3063131536 | Leslye Narvaez | Leslye Narvaez | ✅ YES | ✅ YES |
-| 3063131700 | Brock Jackson | Brock Jackson | ✅ YES | ✅ YES |
 | 3063135560 | Athar Hussain | Athar Hussain | ✅ YES | ✅ YES |
 | 3063138243 | MITCHELL BRECHT | Mitchell Brecht | ✅ YES | ✅ YES |
 | 3064502735 | Brennan Larson | Brennan Larson | ✅ YES | ✅ YES |
@@ -103,7 +102,6 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 3613714226 | Jessica Gwinn | Jessica Gwinn | ✅ YES | ✅ YES |
 | 3613714227 | Jay Storms | Jay Storms | ✅ YES | ✅ YES |
 | 3613714228 | Henry Elizondo | Henry Elizondo | ✅ YES | ✅ YES |
-| 3613714229 | Donato Gonzalez | Donato Gonzalez | ✅ YES | ✅ YES |
 | 3613714230 | Maria Alarcon | Maria Alarcon | ✅ YES | ✅ YES |
 | 3613714231 | David Walsh | David Walsh | ✅ YES | ✅ YES |
 | 3613714232 | Matthew Hernandez | Matthew Hernandez | ✅ YES | ✅ YES |
@@ -116,7 +114,6 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 3613714326 | Chris Garcia | Chris Garcia | ✅ YES | ✅ YES |
 | 3613714348 | Keith Gary | Keith Gary | ✅ YES | ✅ YES |
 | 3613714349 | Marina Rivera | Marina Rivera | ✅ YES | ✅ YES |
-| 3613714351 | Phillip Perez | Phillip Perez | ✅ YES | ✅ YES |
 | 3613714352 | Ram Martinez | Ram Martinez | ✅ YES | ✅ YES |
 | 3613714353 | Ramsey Blanco | Ramsey Blanco | ✅ YES | ✅ YES |
 | 3613714354 | Vicente Cantu | Vicente Cantu | ✅ YES | ✅ YES |
@@ -129,7 +126,6 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4032064005 | Kristin Aquino | Kristin Aquino | ✅ YES | ✅ YES |
 | 4032064006 | Jean-Claude Amyotte | Jean-Claude Amyotte | ✅ YES | ✅ YES |
 | 4032064007 | Natasha Harvey | Natasha Harvey | ✅ YES | ✅ YES |
-| 4032064008 | Linda Song | Linda Song | ✅ YES | ✅ YES |
 | 4032064009 | Teresa Lindsay | Teresa Lindsay | ✅ YES | ✅ YES |
 | 4032064012 | Moein Ghavi | Moein Ghavi | ✅ YES | ✅ YES |
 | 4032064013 | Colin Bennett | Colin Bennett | ✅ YES | ✅ YES |
@@ -139,14 +135,12 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4032064018 | Nathalie Wyman | Nathalie Wyman | ✅ YES | ✅ YES |
 | 4032064019 | Frederick Omeke | Frederick Omeke | ✅ YES | ✅ YES |
 | 4032064020 | Braden deVries | Braden deVries | ✅ YES | ✅ YES |
-| 4032064021 | Alaa Al-Eryani | Alaa Al-Eryani | ✅ YES | ✅ YES |
 | 4032064022 | Edbert Tanaldo | Edbert Tanaldo | ✅ YES | ✅ YES |
 | 4032064023 | Bryan Kennedy | Bryan Kennedy | ✅ YES | ✅ YES |
 | 4032064024 | Caleb Zimmerman | Caleb Zimmerman | ✅ YES | ✅ YES |
 | 4032064025 | Harry MacKenzie | Harry MacKenzie | ✅ YES | ✅ YES |
 | 4032064026 | Andrew Holowaychuk | Andrew Holowaychuk | ✅ YES | ✅ YES |
 | 4032064027 | Estefania Garay | Estefania Garay | ✅ YES | ✅ YES |
-| 4032064028 | Barb Steele | Barb Steele | ✅ YES | ✅ YES |
 | 4032064029 | Stephanie Parbhu | Stephanie Parbhu | ✅ YES | ✅ YES |
 | 4032064030 | Mirela Hiti | Mirela Hiti | ✅ YES | ✅ YES |
 | 4032064031 | Mahek Ramzan | Mahek Ramzan | ✅ YES | ✅ YES |
@@ -159,21 +153,18 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4032064040 | Curtis Philippon | Curtis Philippon | ✅ YES | ✅ YES |
 | 4032064042 | Josie Dos Santos | Josie Dos Santos | ✅ YES | ✅ YES |
 | 4032064043 | Eric Gilholme | Eric Gilholme | ✅ YES | ✅ YES |
-| 4032064044 | Raelyn West | Raelyn West | ✅ YES | ✅ YES |
 | 4032064046 | Bharat Bodawala | Bharat Bodawala | ✅ YES | ✅ YES |
 | 4032064047 | Andrew Arnold | Andrew Arnold | ✅ YES | ✅ YES |
 | 4032064048 | Darwin Margate | Darwin Margate | ✅ YES | ✅ YES |
 | 4032064049 | Stephanie Creelman | Stephanie Creelman | ✅ YES | ✅ YES |
 | 4032064050 | Kendra Hand | Kendra Hand | ✅ YES | ✅ YES |
 | 4032064051 | Dave Artuz | Dave Artuz | ✅ YES | ✅ YES |
-| 4032064052 | Patrick Clark | Patrick Clark | ✅ YES | ✅ YES |
 | 4032064053 | Collin Merritt | Collin Merritt | ✅ YES | ✅ YES |
 | 4032064054 | Daniel Diao | Daniel Diao | ✅ YES | ✅ YES |
 | 4032064056 | Romina Suarin | Romina Suarin | ✅ YES | ✅ YES |
 | 4032064057 | Abby Czaikowski | Abby Czaikowski | ✅ YES | ✅ YES |
 | 4032064058 | Carter Weenk | Carter Weenk | ✅ YES | ✅ YES |
 | 4032064059 | Bolin Du | Bolin Du | ✅ YES | ✅ YES |
-| 4032064060 | Ashley Jung | Ashley Jung | ✅ YES | ✅ YES |
 | 4032064061 | Trevor Boudreau | Trevor Boudreau | ✅ YES | ✅ YES |
 | 4032064063 | Amy Liu | Amy Liu | ✅ YES | ✅ YES |
 | 4032064064 | Alicia Crawford | Alicia Crawford | ✅ YES | ✅ YES |
@@ -188,7 +179,6 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4032064073 | Lisa Wenman-Sturm | Lisa Wenman-Sturm | ✅ YES | ✅ YES |
 | 4032064074 | Chelsea Hodgson | Chelsea Hodgson | ✅ YES | ✅ YES |
 | 4032064076 | Mike Boulter | Mike Boulter | ✅ YES | ✅ YES |
-| 4032064077 | Sydney Jones-Dunlop | Sydney Jones-Dunlop | ✅ YES | ✅ YES |
 | 4032064078 | Cameron LaValley | Cameron LaValley | ✅ YES | ✅ YES |
 | 4032064079 | Sherron Weenk | Sherron Weenk | ✅ YES | ✅ YES |
 | 4032064080 | Laura Vega Garcia | Laura Vega Garcia | ✅ YES | ✅ YES |
@@ -202,7 +192,6 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4032064090 | Anum Ali | Anum Ali | ✅ YES | ✅ YES |
 | 4032064091 | Samantha Little | Samantha Little | ✅ YES | ✅ YES |
 | 4032064092 | Denise Bolduc | Denise Bolduc | ✅ YES | ✅ YES |
-| 4032064093 | Helene Forero | Helene Forero | ✅ YES | ✅ YES |
 | 4032064094 | Brandon Kwong | Brandon Kwong | ✅ YES | ✅ YES |
 | 4032064095 | Kerry Wojcichowsky | Kerry Wojcichowsky | ✅ YES | ✅ YES |
 | 4032064096 | Archie Choudhary | Archie Choudhary | ✅ YES | ✅ YES |
@@ -219,21 +208,16 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4032064110 | Erin Seaman | Erin Seaman | ✅ YES | ✅ YES |
 | 4032064113 | Alexis Gendra Garcia | Alexis Gendra Garcia | ✅ YES | ✅ YES |
 | 4032064114 | Cindy Ly | Cindy Ly | ✅ YES | ✅ YES |
-| 4032064116 | Christine Smith | Christine Smith | ✅ YES | ✅ YES |
 | 4032064121 | Patricia Fernandez | Patricia Fernandez | ✅ YES | ✅ YES |
-| 4032064123 | Ksenia Kabanova | Ksenia Kabanova | ✅ YES | ✅ YES |
 | 4032064124 | Isaac Datoc | Isaac Datoc | ✅ YES | ✅ YES |
 | 4032064126 | Kiesha Magan | Kiesha Magan | ✅ YES | ✅ YES |
-| 4032064127 | Tammy Brehaut | Tammy Brehaut | ✅ YES | ✅ YES |
 | 4032064129 | Dave Gosse | Dave Gosse | ✅ YES | ✅ YES |
 | 4032064130 | Sum Leung | Sum Leung | ✅ YES | ✅ YES |
 | 4032064131 | Marc Rowe | Marc Rowe | ✅ YES | ✅ YES |
 | 4032064132 | Arash Khodabandeh | Arash Khodabandeh | ✅ YES | ✅ YES |
 | 4032064133 | Joey Crisalli | Joey Crisalli | ✅ YES | ✅ YES |
 | 4032064134 | Anna Palmiere | Anna Palmiere | ✅ YES | ✅ YES |
-| 4032064135 | Elena Nistor | Elena Nistor | ✅ YES | ✅ YES |
 | 4032064138 | Kelsey Thomson-Dallyn | Kelsey Thomson-Dallyn | ✅ YES | ✅ YES |
-| 4032064141 | Rob Kaupp | Rob Kaupp | ✅ YES | ✅ YES |
 | 4032064142 | Libby Carr | Libby Carr | ✅ YES | ✅ YES |
 | 4032064158 | Yvonne Teunissen | Yvonne Teunissen | ✅ YES | ✅ YES |
 | 4032064164 | Alisa Denton | Alisa Denton | ✅ YES | ✅ YES |
@@ -243,7 +227,6 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4032064195 | Alex Tang | Alex Tang | ✅ YES | ✅ YES |
 | 4032064202 | Ivan Burton | Ivan Burton | ✅ YES | ✅ YES |
 | 4032064203 | Taha Ahmed | Taha Ahmed | ✅ YES | ✅ YES |
-| 4032064231 | Kristen Neundorf | Kristen Neundorf | ✅ YES | ✅ YES |
 | 4032064236 | Jose Pinerua Pina | Jose Pinerua Pina | ✅ YES | ✅ YES |
 | 4032064237 | Bala Ganapathy | Bala Ganapathy | ✅ YES | ✅ YES |
 | 4032064238 | Chris Fanning | Chris Fanning | ✅ YES | ✅ YES |
@@ -257,12 +240,10 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4032064286 | Kamran Naseer | Kamran Naseer | ✅ YES | ✅ YES |
 | 4032064288 | Ramiro Millan | Ramiro Millan | ✅ YES | ✅ YES |
 | 4032064294 | Priya Denton | Priya Denton | ✅ YES | ✅ YES |
-| 4032064295 | Anthony Singh | Anthony Singh | ✅ YES | ✅ YES |
 | 4032064298 | Dali Festa | Dali Festa | ✅ YES | ✅ YES |
 | 4033051368 | Patrick Zajac | Patrick Zajac | ✅ YES | ✅ YES |
 | 4033541817 | Dan Stoffman | Dan Stoffman | ✅ YES | ✅ YES |
 | 4033541845 | Aaron Gruending | Aaron Gruending | ✅ YES | ✅ YES |
-| 4033543150 | Kristen Neundorf | Kristen Neundorf | ✅ YES | ✅ YES |
 | 4033543171 | Michaela Greene | Michaela Greene | ✅ YES | ✅ YES |
 | 4033543343 | Michael Zhou | Michael Zhou | ✅ YES | ✅ YES |
 | 4033543352 | Pavel Jacobs | Pavel Jacobs | ✅ YES | ✅ YES |
@@ -272,16 +253,15 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4033544198 | Tara Hingley | Tara Hingley | ✅ YES | ✅ YES |
 | 4033544509 | Dee Nel | Dee Nel | ✅ YES | ✅ YES |
 | 4033544761 | Zack Poirier | Zack Poirier | ✅ YES | ✅ YES |
+| 4033545682 | Bala Ganapathy | Bala Ganapathy | ✅ YES | ✅ YES |
 | 4033545817 | Travis Hawkins | Travis Hawkins | ✅ YES | ✅ YES |
 | 4033693671 | Kendra Hand | Kendra Hand | ✅ YES | ✅ YES |
-| 4033695206 | Shelby Kirkpatrick | Shelby Kirkpatrick | ✅ YES | ✅ YES |
 | 4033697141 | Kristen Pintea | Kristen Pintea | ✅ YES | ✅ YES |
-| 4033715608 | Carey Kofluk | Carey Kofluk | ✅ YES | ✅ YES |
 | 4033717068 | Cameron Duncan | Cameron Duncan | ✅ YES | ✅ YES |
 | 4033909611 | Andrew Mackenzie | Andrew Mackenzie | ✅ YES | ✅ YES |
 | 4034089159 | Mohamed Borhot | Mohamed Borhot | ✅ YES | ✅ YES |
 | 4034372481 | Kyla McMullin | Kyla McMullin | ✅ YES | ✅ YES |
-| 4034373697 | Sydney Jones-Dunlop | Sydney Jones-Dunlop | ✅ YES | ✅ YES |
+| 4034374058 | Kelly Holtby | Kelly Holtby | ✅ YES | ✅ YES |
 | 4034625309 | Mike Boulter | Mike Boulter | ✅ YES | ✅ YES |
 | 4034627921 | Atif Qayyum | Atif Qayyum | ✅ YES | ✅ YES |
 | 4034628486 | Alex Tang | Alex Tang | ✅ YES | ✅ YES |
@@ -303,11 +283,10 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4034794154 | Andrew Holowaychuk | Andrew Holowaychuk | ✅ YES | ✅ YES |
 | 4034799831 | Connor DeMaere | Connor DeMaere | ✅ YES | ✅ YES |
 | 4034834021 | Robert Kennedy | Robert Kennedy | ✅ YES | ✅ YES |
-| 4034976328 | Rob Kaupp | Rob Kaupp | ✅ YES | ✅ YES |
+| 4034974245 | Connor Murray | Connor Murray | ✅ YES | ✅ YES |
 | 4035086002 | Rashid Almaktary | Rashid Almaktary | ✅ YES | ✅ YES |
 | 4035086008 | Debbie Parker | Debbie Parker | ✅ YES | ✅ YES |
 | 4035086009 | Kelly Holtby | Kelly Holtby | ✅ YES | ✅ YES |
-| 4035103040 | Sean Warner | Sean Warner | ✅ YES | ✅ YES |
 | 4035192338 | Sunny Xie | Sunny Xie | ✅ YES | ✅ YES |
 | 4035402891 | Jason Risk | Jason Risk | ✅ YES | ✅ YES |
 | 4035406027 | Craig Lindsay | Craig Lindsay | ✅ YES | ✅ YES |
@@ -326,15 +305,16 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4036063187 | Debbie Parker | Debbie Parker | ✅ YES | ✅ YES |
 | 4036069871 | Dali Festa | Dali Festa | ✅ YES | ✅ YES |
 | 4036088548 | Lisa Wenman-Sturm | Lisa Wenman-Sturm | ✅ YES | ✅ YES |
-| 4036139038 | Anthony Singh | Anthony Singh | ✅ YES | ✅ YES |
 | 4036144960 | Rakhee Damji | Rakhee Damji | ✅ YES | ✅ YES |
 | 4036192449 | Sue Gulin | Sue Gulin | ✅ YES | ✅ YES |
+| 4036604056 | Stephanie Parbhu | Stephanie Parbhu | ✅ YES | ✅ YES |
+| 4036692604 | Robert Fraser | Robert Fraser | ✅ YES | ✅ YES |
+| 4037015297 | Riley Hicks | Riley Hicks | ✅ YES | ✅ YES |
 | 4037045422 | Joey Crisalli | Joey Crisalli | ✅ YES | ✅ YES |
 | 4037104273 | Ryan Hyland | Ryan Hyland | ✅ YES | ✅ YES |
 | 4037712521 | Cam Joyce | Cam Joyce | ✅ YES | ✅ YES |
 | 4037763008 | Robert Fraser | Robert Fraser | ✅ YES | ✅ YES |
 | 4037763017 | Riley Hicks | Riley Hicks | ✅ YES | ✅ YES |
-| 4037763027 | Dave Reschke | Dave Reschke | ✅ YES | ✅ YES |
 | 4037763031 | Dan Nieuwenhuis | Dan Nieuwenhuis | ✅ YES | ✅ YES |
 | 4037763032 | Byron Roberts | Byron Roberts | ✅ YES | ✅ YES |
 | 4037763036 | Jessica Gacek | Jessica Gacek | ✅ YES | ✅ YES |
@@ -346,8 +326,6 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4037763061 | Carla Watters | Carla Watters | ✅ YES | ✅ YES |
 | 4037763065 | Travis Hawkins | Travis Hawkins | ✅ YES | ✅ YES |
 | 4037763068 | Connor Murray | Connor Murray | ✅ YES | ✅ YES |
-| 4037763071 | Nicole Haddow | Nicole Haddow | ✅ YES | ✅ YES |
-| 4037763073 | Howell Pioquinto | Howell Pioquinto | ✅ YES | ✅ YES |
 | 4037763082 | Karl Woolfsmith | Karl Woolfsmith | ✅ YES | ✅ YES |
 | 4037763095 | James Lange | James Lange | ✅ YES | ✅ YES |
 | 4037763096 | Bob Little | Bob Little | ✅ YES | ✅ YES |
@@ -382,13 +360,11 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4037812634 | Jacky Law | Jacky Law | ✅ YES | ✅ YES |
 | 4037812647 | Andrew Mackenzie | Andrew Mackenzie | ✅ YES | ✅ YES |
 | 4037812661 | Nate L'Archeveque | Nate L'Archeveque | ✅ YES | ✅ YES |
-| 4037812678 | Sean Warner | Sean Warner | ✅ YES | ✅ YES |
 | 4037812679 | Doug Szeto | Doug Szeto | ✅ YES | ✅ YES |
 | 4037812685 | Mutasem Omer - Alhaj | Mutasem Omer - Alhaj | ✅ YES | ✅ YES |
 | 4037812689 | Mandy Adamowski | Mandy Adamowski | ✅ YES | ✅ YES |
 | 4037812693 | Patrick Slattery | Patrick Slattery | ✅ YES | ✅ YES |
 | 4037812694 | Michele Jong | Michele Jong | ✅ YES | ✅ YES |
-| 4037812695 | Shelby Kirkpatrick | Shelby Kirkpatrick | ✅ YES | ✅ YES |
 | 4037812808 | Tara Hingley | Tara Hingley | ✅ YES | ✅ YES |
 | 4037812811 | Zack Poirier | Zack Poirier | ✅ YES | ✅ YES |
 | 4037812820 | Michaela Greene | Michaela Greene | ✅ YES | ✅ YES |
@@ -398,6 +374,7 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4037812854 | Sam Park | Sam Park | ✅ YES | ✅ YES |
 | 4037812887 | Olivia Kwong | Olivia Kwong | ✅ YES | ✅ YES |
 | 4037812892 | Wayne Abernethy | Wayne Abernethy | ✅ YES | ✅ YES |
+| 4037965763 | Mike Morden | Mike Morden | ✅ YES | ✅ YES |
 | 4037966018 | Karl Woolfsmith | Karl Woolfsmith | ✅ YES | ✅ YES |
 | 4038052702 | Denise Bolduc | Denise Bolduc | ✅ YES | ✅ YES |
 | 4038057984 | Alexis Gendra Garcia | Alexis Gendra Garcia | ✅ YES | ✅ YES |
@@ -406,17 +383,18 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4038136779 | Raj Benwait | Raj Benwait | ✅ YES | ✅ YES |
 | 4038150927 | Ann Sauve | Ann Sauve | ✅ YES | ✅ YES |
 | 4038265772 | Jocelyn Wegen | Jocelyn Wegen | ✅ YES | ✅ YES |
-| 4038273358 | Patrick Clark | Patrick Clark | ✅ YES | ✅ YES |
 | 4038277956 | Josie Dos Santos | Josie Dos Santos | ✅ YES | ✅ YES |
 | 4038289725 | Patrick Slattery | Patrick Slattery | ✅ YES | ✅ YES |
 | 4038292242 | Robyn Hadley | Robyn Hadley | ✅ YES | ✅ YES |
 | 4038294533 | Tom Hades | Tom Hades | ✅ YES | ✅ YES |
 | 4038309624 | Ramiro Millan | Ramiro Millan | ✅ YES | ✅ YES |
 | 4038315963 | Dustin Roberts | Dustin Roberts | ✅ YES | ✅ YES |
+| 4038358716 | Dave Gosse | Dave Gosse | ✅ YES | ✅ YES |
 | 4038364130 | Johnny Wong | Johnny Wong | ✅ YES | ✅ YES |
+| 4038369052 | Tracey Lefaivre | Tracey Lefaivre | ✅ YES | ✅ YES |
 | 4038370149 | Nathalie Wyman | Nathalie Wyman | ✅ YES | ✅ YES |
-| 4038600041 | Nicole Haddow | Nicole Haddow | ✅ YES | ✅ YES |
 | 4038604775 | Sherron Weenk | Sherron Weenk | ✅ YES | ✅ YES |
+| 4038611467 | Carson Ho | Carson Ho | ✅ YES | ✅ YES |
 | 4038754865 | Trevor Boudreau | Trevor Boudreau | ✅ YES | ✅ YES |
 | 4039215547 | Mataya Blakney | Mataya Blakney | ✅ YES | ✅ YES |
 | 4039231140 | Darwin Margate | Darwin Margate | ✅ YES | ✅ YES |
@@ -426,16 +404,14 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4039710474 | Ivan Burton | Ivan Burton | ✅ YES | ✅ YES |
 | 4039734568 | Vic Lit Chung | Vic Lit Chung | ✅ YES | ✅ YES |
 | 4039789149 | Jackie Archibald | Jackie Archibald | ✅ YES | ✅ YES |
-| 4039789394 | Dave Reschke | Dave Reschke | ✅ YES | ✅ YES |
-| 4039883919 | Danielle Arienzale | Danielle Arienzale | ✅ YES | ✅ YES |
-| 4325274053 | Bert Widner | Bert Widner | ✅ YES | ✅ YES |
+| 4039912409 | Mike McNulty | Mike McNulty | ✅ YES | ✅ YES |
+| 4039926478 | Beth Pollock | Beth Pollock | ✅ YES | ✅ YES |
 | 4325274056 | Daniella Lara | Daniella Lara | ✅ YES | ✅ YES |
 | 4325274120 | Greg Lingafelter | Greg Lingafelter | ✅ YES | ✅ YES |
 | 4325274126 | Lance Woody | Lance Woody | ✅ YES | ✅ YES |
 | 4325274141 | John Sandate | John Sandate | ✅ YES | ✅ YES |
 | 4325274242 | Rene Perez Chaparro | Rene Perez Chaparro | ✅ YES | ✅ YES |
 | 4325276553 | Terrie Rytter | Terrie Rytter | ✅ YES | ✅ YES |
-| 4325276565 | Yanin Garcia | Yanin Garcia | ✅ YES | ✅ YES |
 | 4325276655 | Jesus Ornelas | Jesus Ornelas | ✅ YES | ✅ YES |
 | 5872151137 | Eric Gilholme | Eric Gilholme | ✅ YES | ✅ YES |
 | 5872160508 | Bolin Du | Bolin Du | ✅ YES | ✅ YES |
@@ -448,20 +424,17 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 5873182725 | Jenah Lapida | Jenah Lapida | ✅ YES | ✅ YES |
 | 5873355704 | Taylor Johnstone | Taylor Johnstone | ✅ YES | ✅ YES |
 | 5873359154 | Jayson Oleschuk | Jayson Oleschuk | ✅ YES | ✅ YES |
-| 5873378795 | Christina Ramsankar | Christina Ramsankar | ✅ YES | ✅ YES |
 | 5873403259 | Raya Kuznetsova | Raya Kuznetsova | ✅ YES | ✅ YES |
 | 5873407770 | Jessie Chen | Jessie Chen | ✅ YES | ✅ YES |
 | 5873419983 | Tsegaye Teketel | Tsegaye Teketel | ✅ YES | ✅ YES |
 | 5873437486 | Kenton Bekkema | Kenton Bekkema | ✅ YES | ✅ YES |
 | 5873578247 | Mike Arychuk | Mike Arychuk | ✅ YES | ✅ YES |
-| 5873858728 | Megan Kootenay West | Megan Kootenay West | ✅ YES | ✅ YES |
 | 5874365314 | Ana Fedorov | Ana Fedorov | ✅ YES | ✅ YES |
 | 5874366954 | Basim Abdalla | Basim Abdalla | ✅ YES | ✅ YES |
 | 5874367083 | Kerry Wojcichowsky | Kerry Wojcichowsky | ✅ YES | ✅ YES |
 | 5874374285 | Jessica Gacek | Jessica Gacek | ✅ YES | ✅ YES |
 | 5874382571 | Jean-Claude Amyotte | Jean-Claude Amyotte | ✅ YES | ✅ YES |
 | 5874385472 | Mark Lyons | Mark Lyons | ✅ YES | ✅ YES |
-| 5874392367 | Tammy Brehaut | Tammy Brehaut | ✅ YES | ✅ YES |
 | 5875824518 | Andrew Arnold | Andrew Arnold | ✅ YES | ✅ YES |
 | 5875827946 | Abby Czaikowski | Abby Czaikowski | ✅ YES | ✅ YES |
 | 5875850391 | Colin Bennett | Colin Bennett | ✅ YES | ✅ YES |
@@ -470,9 +443,7 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 5877856633 | Jen Tween | Jen Tween | ✅ YES | ✅ YES |
 | 5878302382 | Cameron Ho | Cameron Ho | ✅ YES | ✅ YES |
 | 5878347828 | James Lange | James Lange | ✅ YES | ✅ YES |
-| 5878370418 | Alaa Al-Eryani | Alaa Al-Eryani | ✅ YES | ✅ YES |
 | 5878373402 | Mirela Hiti | Mirela Hiti | ✅ YES | ✅ YES |
-| 5878780715 | John Mitchell | John Mitchell | ✅ YES | ✅ YES |
 | 5878928399 | Brandy McGrath | Brandy McGrath | ✅ YES | ✅ YES |
 | 5878928849 | Alisa Denton | Alisa Denton | ✅ YES | ✅ YES |
 | 5879437191 | Nancy Spratt | Nancy Spratt | ✅ YES | ✅ YES |
@@ -482,7 +453,6 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 7802189461 | Dean Olson | Dean Olson | ✅ YES | ✅ YES |
 | 7802311448 | Andre Roehler | Andre Roehler | ✅ YES | ✅ YES |
 | 7802321785 | Bill Hawes | Bill Hawes | ✅ YES | ✅ YES |
-| 7802339711 | Chad Helliwell | Chad Helliwell | ✅ YES | ✅ YES |
 | 7802377921 | Toby Antony | Toby Antony | ✅ YES | ✅ YES |
 | 7802378203 | Craig Makarowski | Craig Makarowski | ✅ YES | ✅ YES |
 | 7802674026 | Darcy Smith | Darcy Smith | ✅ YES | ✅ YES |
@@ -497,6 +467,7 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 7806914836 | Kajtek Wasaznik | Kajtek Wasaznik | ✅ YES | ✅ YES |
 | 7807215676 | Tyson Armitage | Tyson Armitage | ✅ YES | ✅ YES |
 | 7807811531 | Brandon Parsons | Brandon Parsons | ✅ YES | ✅ YES |
+| 7808420756 | Kyle Newton | Kyle Newton | ✅ YES | ✅ YES |
 | 7808688253 | Terelle Janzen | Terelle Janzen | ✅ YES | ✅ YES |
 | 7808881028 | Jeff Watkins | Jeff Watkins | ✅ YES | ✅ YES |
 | 7808881029 | Devin Trenerry | Devin Trenerry | ✅ YES | ✅ YES |
@@ -516,7 +487,6 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 7808885374 | Colin Scherger | Colin Scherger | ✅ YES | ✅ YES |
 | 7808885413 | Wayne Jackson | Wayne Jackson | ✅ YES | ✅ YES |
 | 7808885416 | Donna Head | Donna Head | ✅ YES | ✅ YES |
-| 7808885624 | Justin Skerlak | Justin Skerlak | ✅ YES | ✅ YES |
 | 7808885631 | Shane Tomlinson | Shane Tomlinson | ✅ YES | ✅ YES |
 | 7808885706 | Cory Checknita | Cory Checknita | ✅ YES | ✅ YES |
 | 7808885877 | Cade Kemper | Cade Kemper | ✅ YES | ✅ YES |
@@ -533,10 +503,10 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 7808887294 | Mitch MacKay | Mitch MacKay | ✅ YES | ✅ YES |
 | 7808887425 | Dallas Bendfeld | Dallas Bendfeld | ✅ YES | ✅ YES |
 | 7808887602 | Jim Schubada | Jim Schubada | ✅ YES | ✅ YES |
-| 7808887606 | Matt Martens | Matt Martens | ✅ YES | ✅ YES |
 | 7808887614 | Grant Imlah | Grant Imlah | ✅ YES | ✅ YES |
 | 7808887618 | Cody Johnson | Cody Johnson | ✅ YES | ✅ YES |
 | 7808887934 | Rick Sather | Rick Sather | ✅ YES | ✅ YES |
+| 7809058961 | Kevin Kromm | Kevin Kromm | ✅ YES | ✅ YES |
 | 7809134737 | Lyle Young | Lyle Young | ✅ YES | ✅ YES |
 | 7809844732 | PATRICK DOWER | Patrick Dower | ✅ YES | ✅ YES |
 | 7809963824 | Travis Duperron | Travis Duperron | ✅ YES | ✅ YES |
@@ -561,8 +531,8 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 8329933970 | Harris Brett | Harris Brett | ✅ YES | ✅ YES |
 
 **Cross-Reference Summary:**
-- Phone numbers with matching users: 479/480 (99.8%)
-- Phone numbers with consistent status: 479/480 (99.8%)
+- Phone numbers with matching users: 449/450 (99.8%)
+- Phone numbers with consistent status: 449/450 (99.8%)
 
 ## 📱 Phone Number Reassignments
 
@@ -570,12 +540,13 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 
 ## 🚨 Critical Issues Requiring Immediate Attention
 
-### 🔴 Users Who Should Be EXPIRED (142 found)
+### 🔴 Users Who Should Be EXPIRED (187 found)
 
 **💰 FINANCIAL IMPACT:** These are users NOT in Active Directory but we're still paying for their phone services.
 
 | Phone Number | Service Overview User | Problem |
 |--------------|----------------------|---------|
+| 3063131700 | Brock Jackson | Service shows Active but phone not in AD |
 | 3066313224 | Brock Wilcox | Service shows Active but phone not in AD |
 | 3066813523 | MSJ CRUDE UNIT CHIEF EMERG LINE RB BLANCHETTE | Service shows Active but phone not in AD |
 | 3066813557 | Jari Yrkki | Service shows Active but phone not in AD |
@@ -585,19 +556,31 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 3613714212 | Keith Gary | Service shows Active but phone not in AD |
 | 3613714215 | Antonio Garcia | Service shows Active but phone not in AD |
 | 3613714218 | Jonathan Tamez | Service shows Active but phone not in AD |
+| 3613714229 | Donato Gonzalez | Service shows Active but phone not in AD |
+| 3613714351 | Bryan Stinnett | Service shows Active but phone not in AD |
 | 3613714357 | Keith Gary | Service shows Active but phone not in AD |
 | 3613714358 | Barry Duge | Service shows Active but phone not in AD |
 | 3689952749 | HUB 2 HUB 2 | Service shows Active but phone not in AD |
 | 4032064001 | Gibson Main Fax | Service shows Active but phone not in AD |
 | 4032064010 | Reception Calgary HO physical phone | Service shows Active but phone not in AD |
 | 4032064015 | HR fax - confidential | Service shows Active but phone not in AD |
+| 4032064021 | Alaa Al-Eryani | Service shows Active but phone not in AD |
+| 4032064028 | Barb Steele | Service shows Active but phone not in AD |
 | 4032064039 | EHS OCC Health fax - confidential | Service shows Active but phone not in AD |
+| 4032064044 | Raelyn West | Service shows Active but phone not in AD |
+| 4032064052 | Patrick Clark | Service shows Active but phone not in AD |
 | 4032064062 | Testing Deputy Director EOC queue | Service shows Active but phone not in AD |
+| 4032064077 | Sydney Jones-Dunlop | Service shows Active but phone not in AD |
 | 4032064088 | Kendra Rolheiser | Service shows Active but phone not in AD |
 | 4032064089 | CGY 1725 Meeting Room | Service shows Active but phone not in AD |
+| 4032064093 | Helene Forero | Service shows Active but phone not in AD |
 | 4032064105 | AdminLine | Service shows Active but phone not in AD |
+| 4032064116 | Christine Smith | Service shows Active but phone not in AD |
 | 4032064118 | Janice Proctor | Service shows Active but phone not in AD |
 | 4032064122 | Owen Breast | Service shows Active but phone not in AD |
+| 4032064123 | Ksenia Kabanova | Service shows Active but phone not in AD |
+| 4032064127 | Tammy Brehaut | Service shows Active but phone not in AD |
+| 4032064135 | Elena Nistor | Service shows Active but phone not in AD |
 | 4032064154 | CGY 1809 Meeting Room | Service shows Active but phone not in AD |
 | 4032064156 | Pam Murphy | Service shows Active but phone not in AD |
 | 4032064159 | 1598 - West Meeting Room | Service shows Active but phone not in AD |
@@ -606,33 +589,48 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4032064191 | Genevieve Datoc | Service shows Active but phone not in AD |
 | 4032064205 | ActionLine | Service shows Active but phone not in AD |
 | 4032064211 | Finance fax | Service shows Active but phone not in AD |
+| 4032064231 | Kristen Neundorf | Service shows Active but phone not in AD |
 | 4032064242 | Hardisty Board Room PCC | Service shows Active but phone not in AD |
 | 4032064252 | Wellsite Orders | Service shows Active but phone not in AD |
 | 4032064267 | Rhonda Kottusch | Service shows Active but phone not in AD |
+| 4032064295 | Anthony Singh | Service shows Active but phone not in AD |
 | 4033054743 | Curtis Philippon | Service shows Active but phone not in AD |
 | 4033121315 | Brady Kachur | Service shows Active but phone not in AD |
+| 4033337852 | Sean Whelan | Service shows Active but phone not in AD |
+| 4033543150 | Kristen Neundorf | Service shows Active but phone not in AD |
 | 4033543632 | IPAD CORPORATE COMMUNICATIONS | Service shows Active but phone not in AD |
+| 4033695206 | Vivienne Cline | Service shows Active but phone not in AD |
 | 4033695762 | Eric Yeh | Service shows Active but phone not in AD |
 | 4033696786 | Carter Cranmer-Smith | Service shows Active but phone not in AD |
 | 4033696980 | Helene Forero | Service shows Active but phone not in AD |
 | 4033702742 | GIBSON ENERGY | Service shows Active but phone not in AD |
 | 4033711238 | Michelena Robinson | Service shows Active but phone not in AD |
 | 4034089407 | IPAD CORPORATE | Service shows Active but phone not in AD |
+| 4034373697 | Sydney Jones-Dunlop | Service shows Active but phone not in AD |
 | 4034632123 | Cameron LaValley | Service shows Active but phone not in AD |
 | 4034636526 | IT-ROBK I-BOYD | Service shows Active but phone not in AD |
+| 4034639606 | Braden DeVries | Service shows Active but phone not in AD |
 | 4034647089 | IT-ROBK A-CORP | Service shows Active but phone not in AD |
 | 4034766334 | GIBSON ENERGY COMMUNICATIONS | Service shows Active but phone not in AD |
+| 4034976328 | Rob Kaupp | Service shows Active but phone not in AD |
+| 4035103040 | Sean Warner | Service shows Active but phone not in AD |
 | 4035406471 | Chris Fanning | Service shows Active but phone not in AD |
 | 4035540338 | Wyatt Albrecht | Service shows Active but phone not in AD |
+| 4035618665 | Matt Heynen | Service shows Active but phone not in AD |
 | 4035859901 | Jon Ozirny | Service shows Active but phone not in AD |
+| 4036139038 | Anthony Singh | Service shows Active but phone not in AD |
 | 4036507089 | Erin Seaman | Service shows Active but phone not in AD |
+| 4036516604 | AVAILABLE AVAILABLE | Service shows Active but phone not in AD |
 | 4036606174 | Olivia Kwong | Service shows Active but phone not in AD |
 | 4036714440 | Jessica Ferguson | Service shows Active but phone not in AD |
 | 4037763005 | 1477 - EOC Operations Room | Service shows Active but phone not in AD |
 | 4037763009 | Deputy Director | Service shows Active but phone not in AD |
 | 4037763026 | Logistics | Service shows Active but phone not in AD |
+| 4037763027 | Dave Reschke | Service shows Active but phone not in AD |
 | 4037763040 | CGY 1825 Meeting Room | Service shows Active but phone not in AD |
 | 4037763070 | 1493 - Meeting Room | Service shows Active but phone not in AD |
+| 4037763071 | Nicole Haddow | Service shows Active but phone not in AD |
+| 4037763073 | Howell Pioquinto | Service shows Active but phone not in AD |
 | 4037763077 | Investor Relations | Service shows Active but phone not in AD |
 | 4037763088 | 1404 - Meeting Room | Service shows Active but phone not in AD |
 | 4037763101 | EOC Command | Service shows Active but phone not in AD |
@@ -642,9 +640,11 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4037812621 | Marketing fax | Service shows Active but phone not in AD |
 | 4037812625 | 1628 - Break Out Room | Service shows Active but phone not in AD |
 | 4037812665 | CGY 1775 Meeting Room | Service shows Active but phone not in AD |
+| 4037812678 | Sean Warner | Service shows Active but phone not in AD |
 | 4037812681 | Accounts Payable | Service shows Active but phone not in AD |
 | 4037812687 | 1402 - West Kitchen | Service shows Active but phone not in AD |
 | 4037812690 | CGY 1625 Meeting Room | Service shows Active but phone not in AD |
+| 4037812695 | Shelby Kirkpatrick | Service shows Active but phone not in AD |
 | 4037812806 | 1803 - West Meeting Room | Service shows Active but phone not in AD |
 | 4037812826 | 1690 - Mens Shower | Service shows Active but phone not in AD |
 | 4037812840 | 1644 - Womens Shower | Service shows Active but phone not in AD |
@@ -657,7 +657,13 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 4038015048 | SCADA10. | Service shows Active but phone not in AD |
 | 4038032974 | Anna Palmiere | Service shows Active but phone not in AD |
 | 4038266965 | IT1 | Service shows Active but phone not in AD |
+| 4038273358 | Patrick Clark | Service shows Active but phone not in AD |
+| 4038600041 | Nicole Haddow | Service shows Active but phone not in AD |
+| 4039789394 | Dave Reschke | Service shows Active but phone not in AD |
+| 4039883919 | Danielle Arienzale | Service shows Active but phone not in AD |
 | 4039937564 | CALLOUTBOX1 | Service shows Active but phone not in AD |
+| 4325274053 | Bert Widner | Service shows Active but phone not in AD |
+| 4325276565 | Yanin Garcia | Service shows Active but phone not in AD |
 | 4325276611 | Victor Urias | Service shows Active but phone not in AD |
 | 5872842916 | ZEBRA TABLET 1 | Service shows Active but phone not in AD |
 | 5872842980 | ZEBRA TABLET 2 | Service shows Active but phone not in AD |
@@ -670,10 +676,13 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 5873168180 | CGY 1548 Meeting Room | Service shows Active but phone not in AD |
 | 5873168701 | Hardisty PCC 102 room | Service shows Active but phone not in AD |
 | 5873171501 | Deputy Director EOC test line | Service shows Active but phone not in AD |
+| 5873378795 | Christina Ramsankar | Service shows Active but phone not in AD |
 | 5873559789 | Andres Pico Mantilla | Service shows Active but phone not in AD |
 | 5873559834 | Hardisty PCC 108 room | Service shows Active but phone not in AD |
 | 5873578498 | Tyler Leibel | Service shows Active but phone not in AD |
+| 5873858728 | Megan Kootenay West | Service shows Active but phone not in AD |
 | 5874320283 | IT -ROBK I-CORP | Service shows Active but phone not in AD |
+| 5874392367 | Tammy Brehaut | Service shows Active but phone not in AD |
 | 5874398453 | IT - ROBK A-BOYD | Service shows Active but phone not in AD |
 | 5875720733 | ZEBRA TABLET 4 | Service shows Active but phone not in AD |
 | 5875725115 | ZEBRA TABLET 7 | Service shows Active but phone not in AD |
@@ -682,8 +691,10 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 5875725163 | ZEBRA TABLET 10 | Service shows Active but phone not in AD |
 | 5875725454 | ZEBRA TABLET 5 | Service shows Active but phone not in AD |
 | 5875726971 | ZEBRA TABLET 6 | Service shows Active but phone not in AD |
+| 5878370418 | Alaa Al-Eryani | Service shows Active but phone not in AD |
 | 5878735571 | EDMONTONSCADA2 | Service shows Active but phone not in AD |
 | 5878735578 | EDMONTONSCADA3 | Service shows Active but phone not in AD |
+| 5878780715 | John Mitchell | Service shows Active but phone not in AD |
 | 5878978351 | NIKOLAS KALANTZIS | Service shows Active but phone not in AD |
 | 5879436527 | Teams Cloud Voice (Dedicated) | Service shows Active but phone not in AD |
 | 5879436793 | RESERVATION | Service shows Active but phone not in AD |
@@ -691,6 +702,8 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 5879437194 | Reception Test number | Service shows Active but phone not in AD |
 | 5879998478 | SCADA20 | Service shows Active but phone not in AD |
 | 7802036755 | SONIM2 | Service shows Active but phone not in AD |
+| 7802339711 | Chad Helliwell | Service shows Active but phone not in AD |
+| 7802847192 | KYLE NEWTON | Service shows Active but phone not in AD |
 | 7803941174 | RAILDESK RAILDESK | Service shows Active but phone not in AD |
 | 7804499773 | Edmonton Primary Fax to Email | Service shows Active but phone not in AD |
 | 7805685000 | Kenton Bekkema | Service shows Active but phone not in AD |
@@ -707,12 +720,14 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 | 7805685014 | Sexsmith 14 | Service shows Active but phone not in AD |
 | 7807206155 | SONIM1 | Service shows Active but phone not in AD |
 | 7808061244 | HUBHARDISTY | Service shows Active but phone not in AD |
-| 7808885245 | Niki Horn | Service shows Active but phone not in AD |
+| 7808885245 | Tanu Gopalka | Service shows Active but phone not in AD |
 | 7808885365 | Mitch MacKay | Service shows Active but phone not in AD |
 | 7808885450 | Jay Walline | Service shows Active but phone not in AD |
+| 7808885624 | Justin Skerlak | Service shows Active but phone not in AD |
 | 7808886347 | HARDISTY CT AREA | Service shows Active but phone not in AD |
 | 7808887215 | HARDISTYCALLOUT | Service shows Active but phone not in AD |
 | 7808887568 | Ken Martin | Service shows Active but phone not in AD |
+| 7808887606 | Matt Martens | Service shows Active but phone not in AD |
 | 8252960134 | Nadine | Service shows Active but phone not in AD |
 | 8252960136 | DRU Operators Desk | Service shows Active but phone not in AD |
 | 8252960137 | Donna | Service shows Active but phone not in AD |
@@ -732,7 +747,7 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 
 ### Immediate Priority (High Impact)
 
-2. **Review 142 users marked as active**
+2. **Review 187 users marked as active**
    - Cross-reference with UserManagement.csv for verification
    - Check for phone number reassignments
    - Identify service accounts vs actual users
@@ -744,7 +759,7 @@ When a phone number shows **different users** in Service Overview vs Active Dire
 ## 🚀 Strategic Recommendations
 
 ### 💰 Cost Optimization (High Priority)
-1. **Audit Expired Services** - Review 142 services marked as active but not in AD
+1. **Audit Expired Services** - Review 187 services marked as active but not in AD
    - Potential monthly savings by cancelling unused services
    - Identify service accounts vs former employees
    - Implement automated service termination for departed staff
